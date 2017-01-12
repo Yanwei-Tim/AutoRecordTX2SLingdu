@@ -2938,8 +2938,7 @@ public class MainActivity extends Activity {
 			// recorderFront.setSecondaryVideoFrameRate(10);
 
 			// 640*480 960*540
-			int result = recorderFront.setScaledStreamEnable(true, 640, 480);
-			MyLog.e("setScaledStreamEnable result:" + result);
+			recorderFront.setScaledStreamEnable(true, 640, 480);
 			recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
 
 				@Override
