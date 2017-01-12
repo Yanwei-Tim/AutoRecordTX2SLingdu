@@ -54,12 +54,13 @@ public class TachographRecorder {
 
 	public native int setVideoOverlap(int sec);
 
-	/*
-	 * public native int setSecondaryVideoEnable(boolean enable); public native
-	 * int setSecondaryVideoBiteRate(int bps); public native int
-	 * setSecondaryVideoSize(int width , int height ); public native int
-	 * setSecondaryVideoFrameRate(int fps);
-	 */
+	public native int setSecondaryVideoEnable(boolean enable);
+
+	public native int setSecondaryVideoBiteRate(int bps);
+
+	public native int setSecondaryVideoSize(int width, int height);
+
+	public native int setSecondaryVideoFrameRate(int fps);
 
 	public native int takePicture();
 
@@ -92,7 +93,7 @@ public class TachographRecorder {
 	public native int close();
 
 	public native int release();
-	
+
 	public native int isRecording();
 
 	public native int getVersionCode();

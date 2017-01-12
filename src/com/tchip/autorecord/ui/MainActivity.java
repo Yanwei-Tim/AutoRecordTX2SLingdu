@@ -6,9 +6,6 @@ import com.tchip.autorecord.Constant;
 import com.tchip.autorecord.MyApp;
 import com.tchip.autorecord.R;
 import com.tchip.autorecord.Typefaces;
-//import com.tchip.autorecord.db.BackVideoDbHelper;
-//import com.tchip.autorecord.db.DriveVideo;
-//import com.tchip.autorecord.db.FrontVideoDbHelper;
 import com.tchip.autorecord.service.SensorWatchService;
 import com.tchip.autorecord.thread.MoveImageThread;
 import com.tchip.autorecord.thread.WriteImageExifThread;
@@ -23,6 +20,7 @@ import com.tchip.autorecord.util.ProviderUtil.Name;
 import com.tchip.autorecord.util.SettingUtil;
 import com.tchip.autorecord.util.StorageUtil;
 import com.tchip.autorecord.view.BackLineView;
+import com.tchip.tachograph.ScaledStreamCallback;
 import com.tchip.tachograph.TachographCallback;
 import com.tchip.tachograph.TachographRecorder;
 
@@ -337,8 +335,6 @@ public class MainActivity extends Activity {
 		releaseBackRecorder();
 		closeFrontCamera();
 		closeBackCamera();
-		// frontVideoDb.close();
-		// backVideoDb.close();
 		// 关闭碰撞侦测服务
 		Intent intentCrash = new Intent(context, SensorWatchService.class);
 		stopService(intentCrash);
@@ -724,12 +720,6 @@ public class MainActivity extends Activity {
 	/** 是否开启后录 */
 	private boolean shouldRecordBack() {
 		return Constant.Record.autoRecordBack;
-		/*
-		 * if (uiConfig == UIConfig.SL6 || uiConfig == UIConfig.SL9) { return
-		 * true; } else return sharedPreferences.getBoolean(
-		 * Constant.MySP.STR_SHOULD_RECORD_BACK,
-		 * Constant.Record.autoRecordBack);
-		 */
 	}
 
 	final Handler autoHandler = new Handler() {
@@ -2913,6 +2903,7 @@ public class MainActivity extends Activity {
 					TachographCallback.FILE_TYPE_SHARE_VIDEO, "Share");
 			recorderFront.setMediaFileDirectory(
 					TachographCallback.FILE_TYPE_IMAGE, "Image");
+
 			recorderFront.setClientName(this.getPackageName());
 			if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_1080P) {
 				recorderFront.setVideoSize(1920, 1080); // 分辨率
@@ -2940,6 +2931,24 @@ public class MainActivity extends Activity {
 				recorderFront.setMute(true);
 			}
 			recorderFront.setAudioSampleRate(48000);
+
+			// recorderFront.setSecondaryVideoEnable(true);
+			// recorderFront.setSecondaryVideoSize(640, 480);
+			// recorderFront.setSecondaryVideoBiteRate(120000);
+			// recorderFront.setSecondaryVideoFrameRate(10);
+
+			// 640*480 960*540
+			int result = recorderFront.setScaledStreamEnable(true, 640, 480);
+			MyLog.e("setScaledStreamEnable result:" + result);
+			recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
+
+				@Override
+				public void onScaledStream(byte[] data, int width, int height) {
+					MyLog.i("data:" + data.toString() + ",width:" + width
+							+ ",height:" + height);
+				}
+			});
+
 			recorderFront.prepare();
 		} catch (Exception e) {
 			MyLog.e("setupRecorder: Catch Exception：" + e.toString());
@@ -3154,7 +3163,6 @@ public class MainActivity extends Activity {
 		@Override
 		public void onFileStart(int type, String path) {
 			if (type == 1) {
-				MyApp.nowRecordVideoName = path.split("/")[5];
 				Flash2SDUtil.moveOldFrontVideoToSD();
 			}
 			Flash2SDUtil.moveOldImageToSD();
@@ -3264,7 +3272,6 @@ public class MainActivity extends Activity {
 		@Override
 		public void onFileStart(int type, String path) {
 			if (type == 1) {
-				MyApp.nowRecordVideoName = path.split("/")[5];
 				Flash2SDUtil.moveOldBackVideoToSD();
 			}
 			MyLog.v("Back.onFileStart.Path:" + path);
