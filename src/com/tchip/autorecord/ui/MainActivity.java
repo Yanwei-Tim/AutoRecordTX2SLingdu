@@ -2,6 +2,7 @@ package com.tchip.autorecord.ui;
 
 import java.io.File;
 
+import com.sinosmart.adas.ADASInterface;
 import com.tchip.autorecord.Constant;
 import com.tchip.autorecord.MyApp;
 import com.tchip.autorecord.R;
@@ -36,6 +37,13 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.ContentObserver;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.YuvImage;
+import android.graphics.PorterDuff.Mode;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
@@ -52,6 +60,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.SurfaceHolder.Callback;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -61,8 +70,6 @@ public class MainActivity extends Activity {
 	private Context context;
 	private SharedPreferences sharedPreferences;
 	private Editor editor;
-	// private FrontVideoDbHelper frontVideoDb;
-	// private BackVideoDbHelper backVideoDb;
 	private PowerManager powerManager;
 	private WakeLock partialWakeLock;
 	private WakeLock fullWakeLock;
@@ -137,6 +144,12 @@ public class MainActivity extends Activity {
 	private int CAMERA_WIDTH = 1184;
 	private int CAMERA_HEIGHT = 480;
 
+	// ADAS
+	private ADASInterface adasInterface;
+	private Paint paint;
+	private ImageView imageAdas;
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -195,10 +208,13 @@ public class MainActivity extends Activity {
 		sharedPreferences = getSharedPreferences(Constant.MySP.NAME,
 				Context.MODE_PRIVATE);
 		editor = sharedPreferences.edit();
-		// frontVideoDb = new FrontVideoDbHelper(context); // 视频数据库
-		// backVideoDb = new BackVideoDbHelper(context);
 
 		initialLayout();
+		imageAdas = (ImageView) findViewById(R.id.imageAdas);
+		paint = new Paint();
+		paint.setColor(Color.BLUE);
+		paint.setStrokeWidth(5);
+		paint.setXfermode(new PorterDuffXfermode(Mode.CLEAR));
 
 		getContentResolver()
 				.registerContentObserver(
@@ -369,19 +385,6 @@ public class MainActivity extends Activity {
 					| View.SYSTEM_UI_FLAG_FULLSCREEN;
 			uiFlags |= 0x00001000;
 			getWindow().getDecorView().setSystemUiVisibility(uiFlags);
-		}
-	}
-
-	/**
-	 * TX2S设置行车模式:非全屏，不显示按钮和倒车线
-	 * 
-	 * @param isDriveOn
-	 */
-	private void setDriveMode(boolean isDriveOn) {
-		if (isDriveOn) { // 隐藏录像按钮
-
-		} else { // 显示录像按钮
-
 		}
 	}
 
@@ -2937,14 +2940,34 @@ public class MainActivity extends Activity {
 			// recorderFront.setSecondaryVideoBiteRate(120000);
 			// recorderFront.setSecondaryVideoFrameRate(10);
 
+			adasInterface = new ADASInterface(640, 480, MainActivity.this);
+			adasInterface.setDebug(1);
+			adasInterface.setLane(ADASInterface.SET_ON);
+			adasInterface.setVehicle(ADASInterface.SET_ON);
+
 			// 640*480 960*540
 			recorderFront.setScaledStreamEnable(true, 640, 480);
 			recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
 
 				@Override
 				public void onScaledStream(byte[] data, int width, int height) {
-					MyLog.i("data:" + data.toString() + ",width:" + width
-							+ ",height:" + height);
+					MyLog.i("[onScaledStream]data:" + data + ",width:" + width + ",height:"
+							+ height);
+
+					Bitmap bmp = Bitmap.createBitmap(640, 480,
+							Bitmap.Config.ARGB_8888);
+					// process(,speed,)
+					double[] output;
+					output = new double[256];
+					double speed = 100.0;
+					if (adasInterface.process_yuv(data, speed, output,
+							ADASInterface.YUV_FORMAT_YV12) == 0) {
+						Canvas mCanvas = new Canvas(bmp);
+						mCanvas.drawText("授权码错误", 10, 480 - 10, paint);
+					}
+					adasInterface.Draw(bmp, output);
+
+					imageAdas.setImageBitmap(bmp);
 				}
 			});
 
