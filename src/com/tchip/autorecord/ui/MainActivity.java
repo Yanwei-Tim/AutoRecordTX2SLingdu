@@ -1,6 +1,12 @@
 package com.tchip.autorecord.ui;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import com.sinosmart.adas.ADASInterface;
 import com.tchip.autorecord.Constant;
@@ -149,6 +155,9 @@ public class MainActivity extends Activity {
 	private Paint paint;
 	private ImageView imageAdas;
 
+	// static {
+	// System.loadLibrary("opencv_java");
+	// }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -2940,23 +2949,19 @@ public class MainActivity extends Activity {
 			// recorderFront.setSecondaryVideoBiteRate(120000);
 			// recorderFront.setSecondaryVideoFrameRate(10);
 
-			adasInterface = new ADASInterface(640, 480, MainActivity.this);
+			adasInterface = new ADASInterface(480, 640, MainActivity.this);
 			adasInterface.setDebug(1);
 			adasInterface.setLane(ADASInterface.SET_ON);
 			adasInterface.setVehicle(ADASInterface.SET_ON);
 
-			// 640*480 960*540
 			recorderFront.setScaledStreamEnable(true, 640, 480);
 			recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
 
 				@Override
 				public void onScaledStream(byte[] data, int width, int height) {
-					MyLog.i("[onScaledStream]data:" + data + ",width:" + width + ",height:"
-							+ height);
 
 					Bitmap bmp = Bitmap.createBitmap(640, 480,
 							Bitmap.Config.ARGB_8888);
-					// process(,speed,)
 					double[] output;
 					output = new double[256];
 					double speed = 100.0;
@@ -2974,6 +2979,22 @@ public class MainActivity extends Activity {
 			recorderFront.prepare();
 		} catch (Exception e) {
 			MyLog.e("setupRecorder: Catch Exception：" + e.toString());
+		}
+	}
+
+	private void saveOneYUVImage(byte[] data) {
+		File fileTmp = new File(
+				"/storage/sdcard0/YUVFile_"
+						+ new SimpleDateFormat("yyyyMMdd-HH-mm-ss",
+								Locale.CHINESE).format(new Date()));
+		try {
+			FileOutputStream fos = new FileOutputStream(fileTmp);
+			fos.write(data);
+			fos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
