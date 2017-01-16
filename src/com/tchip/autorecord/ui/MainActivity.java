@@ -2941,13 +2941,9 @@ public class MainActivity extends Activity {
 		}
 		recorderFront.setAudioSampleRate(48000);
 
-		// recorderFront.setSecondaryVideoEnable(true);
-		// recorderFront.setSecondaryVideoSize(640, 480);
-		// recorderFront.setSecondaryVideoBiteRate(120000);
-		// recorderFront.setSecondaryVideoFrameRate(10);
-
 		adasInterface = new ADASInterface(480, 640, MainActivity.this);
-		adasInterface.setDebug(1);
+		// adasInterface.setDebug(1);
+		adasInterface.enableSound(ADASInterface.SET_ON);
 		adasInterface.setLane(ADASInterface.SET_ON);
 		adasInterface.setVehicle(ADASInterface.SET_ON);
 
@@ -2956,9 +2952,11 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onScaledStream(byte[] data, int width, int height) {
-
 				MyLog.i("[onScaledStream]");
+
 				double speed = 100.0;
+				adasBitmap = Bitmap.createBitmap(853, 480,
+						Bitmap.Config.ARGB_8888);
 				if (adasInterface.process_yuv(data, speed, adasOutput,
 						ADASInterface.YUV_FORMAT_YV12) == 0) {
 					Canvas mCanvas = new Canvas(adasBitmap);
@@ -2967,10 +2965,6 @@ public class MainActivity extends Activity {
 				}
 				adasInterface.Draw853480(adasBitmap, adasOutput);
 
-				if (imageAdas == null) {
-					MyLog.i("[onScaledStream]imageAdas is NULL");
-					imageAdas = (ImageView) findViewById(R.id.imageAdas);
-				}
 				imageAdas.setImageBitmap(adasBitmap);
 			}
 		});
