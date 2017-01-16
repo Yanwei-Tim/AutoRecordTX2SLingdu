@@ -286,7 +286,7 @@ public class MainActivity extends Activity {
 				if ("autoui_oncreate".equals(reason)) { // 回到主界面
 					MyApp.shouldMountRecordFront = true;
 					MyApp.shouldMountRecordBack = true;
-					// new Thread(new BackHomeWhenBootThread()).start();
+					// new Thread(new BackHomeWhenBootThread()).start(); 
 				} else if ("acc_on".equals(reason)) {
 					MyApp.shouldMountRecordFront = true;
 					MyApp.shouldMountRecordBack = true;
@@ -2954,9 +2954,9 @@ public class MainActivity extends Activity {
 			public void onScaledStream(byte[] data, int width, int height) {
 				MyLog.i("[onScaledStream]");
 
-				double speed = 100.0;
-				adasBitmap = Bitmap.createBitmap(853, 480,
-						Bitmap.Config.ARGB_8888);
+				double speed = 80.0;
+
+				adasBitmap.eraseColor(Color.TRANSPARENT);
 				if (adasInterface.process_yuv(data, speed, adasOutput,
 						ADASInterface.YUV_FORMAT_YV12) == 0) {
 					Canvas mCanvas = new Canvas(adasBitmap);
