@@ -2942,7 +2942,7 @@ public class MainActivity extends Activity {
 		recorderFront.setAudioSampleRate(48000);
 
 		adasInterface = new ADASInterface(480, 640, MainActivity.this);
-		// adasInterface.setDebug(1);
+		adasInterface.setDebug(1); // 绘制校准箭头
 		adasInterface.enableSound(ADASInterface.SET_ON);
 		adasInterface.setLane(ADASInterface.SET_ON);
 		adasInterface.setVehicle(ADASInterface.SET_ON);
