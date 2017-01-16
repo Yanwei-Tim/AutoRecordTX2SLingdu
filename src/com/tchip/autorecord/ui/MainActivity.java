@@ -150,12 +150,10 @@ public class MainActivity extends Activity {
 
 	// ADAS
 	private ADASInterface adasInterface;
+	private Bitmap adasBitmap;
+	private double[] adasOutput = new double[256];
 	private Paint paint;
 	private ImageView imageAdas;
-
-	// static {
-	// System.loadLibrary("opencv_java");
-	// }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -166,8 +164,7 @@ public class MainActivity extends Activity {
 		brand = Build.BRAND;
 		model = Build.MODEL;
 		if ("TX2S".equals(model)) { // TX2S-9.76
-			CAMERA_WIDTH = 1280;
-			CAMERA_HEIGHT = 445;
+
 			if ("SL".equals(brand)) {
 				uiConfig = UIConfig.SL9;
 			} else {
@@ -190,6 +187,10 @@ public class MainActivity extends Activity {
 				uiConfig = UIConfig.TQ6;
 			}
 		}
+
+		CAMERA_WIDTH = 1280;
+		CAMERA_HEIGHT = 445;
+		uiConfig = UIConfig.SL9;
 
 		if ("TX2S".equals(model)) {
 			setStatusBarVisible(true);
@@ -218,6 +219,8 @@ public class MainActivity extends Activity {
 
 		initialLayout();
 		imageAdas = (ImageView) findViewById(R.id.imageAdas);
+		adasBitmap = Bitmap.createBitmap(853, 480, Bitmap.Config.ARGB_8888); // 640*480
+
 		paint = new Paint();
 		paint.setColor(Color.BLUE);
 		paint.setStrokeWidth(5);
@@ -2895,88 +2898,107 @@ public class MainActivity extends Activity {
 	private void setupFrontRecorder() {
 		MyLog.v("Front.SetupRecorder");
 		releaseFrontRecorder();
-		try {
-			recorderFront = new TachographRecorder();
-			recorderFront.setTachographCallback(new FrontTachographCallback());
-			recorderFront.setCamera(cameraFront);
-			// 前缀，后缀
-			recorderFront.setMediaFilenameFixs(
-					TachographCallback.FILE_TYPE_VIDEO, "", "_0");
-			recorderFront.setMediaFilenameFixs(
-					TachographCallback.FILE_TYPE_SHARE_VIDEO, "", "");
-			recorderFront.setMediaFilenameFixs(
-					TachographCallback.FILE_TYPE_IMAGE, "", "");
-			// 路径
-			recorderFront.setMediaFileDirectory(
-					TachographCallback.FILE_TYPE_VIDEO, "VideoFront");
-			recorderFront.setMediaFileDirectory(
-					TachographCallback.FILE_TYPE_SHARE_VIDEO, "Share");
-			recorderFront.setMediaFileDirectory(
-					TachographCallback.FILE_TYPE_IMAGE, "Image");
+		// try {
+		recorderFront = new TachographRecorder();
+		recorderFront.setTachographCallback(new FrontTachographCallback());
+		recorderFront.setCamera(cameraFront);
+		// 前缀，后缀
+		recorderFront.setMediaFilenameFixs(TachographCallback.FILE_TYPE_VIDEO,
+				"", "_0");
+		recorderFront.setMediaFilenameFixs(
+				TachographCallback.FILE_TYPE_SHARE_VIDEO, "", "");
+		recorderFront.setMediaFilenameFixs(TachographCallback.FILE_TYPE_IMAGE,
+				"", "");
+		// 路径
+		recorderFront.setMediaFileDirectory(TachographCallback.FILE_TYPE_VIDEO,
+				"VideoFront");
+		recorderFront.setMediaFileDirectory(
+				TachographCallback.FILE_TYPE_SHARE_VIDEO, "Share");
+		recorderFront.setMediaFileDirectory(TachographCallback.FILE_TYPE_IMAGE,
+				"Image");
 
-			recorderFront.setClientName(this.getPackageName());
-			if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_1080P) {
-				recorderFront.setVideoSize(1920, 1080); // 分辨率
-				recorderFront
-						.setVideoFrameRate(Constant.Record.FRONT_FRAME_1080P);
-				recorderFront
-						.setVideoBiteRate(Constant.Record.FRONT_BITRATE_1080P);
-			} else {
-				recorderFront.setVideoSize(1280, 720);
-				recorderFront
-						.setVideoFrameRate(Constant.Record.FRONT_FRAME_720P);
-				recorderFront
-						.setVideoBiteRate(Constant.Record.FRONT_BITRATE_720P);
-			}
-			if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) { // 分段
-				recorderFront.setVideoSeconds(3 * 60);
-			} else {
-				recorderFront.setVideoSeconds(1 * 60);
-			}
-			recorderFront.setVideoOverlap(0); // 重叠
-			if (null != sharedPreferences) { // 录音
-				recorderFront.setMute(sharedPreferences.getBoolean("videoMute",
-						Constant.Record.muteDefault));
-			} else {
-				recorderFront.setMute(true);
-			}
-			recorderFront.setAudioSampleRate(48000);
+		recorderFront.setClientName(this.getPackageName());
+		if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_1080P) {
+			recorderFront.setVideoSize(1920, 1080); // 分辨率
+			recorderFront.setVideoFrameRate(Constant.Record.FRONT_FRAME_1080P);
+			recorderFront.setVideoBiteRate(Constant.Record.FRONT_BITRATE_1080P);
+		} else {
+			recorderFront.setVideoSize(1280, 720);
+			recorderFront.setVideoFrameRate(Constant.Record.FRONT_FRAME_720P);
+			recorderFront.setVideoBiteRate(Constant.Record.FRONT_BITRATE_720P);
+		}
+		if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) { // 分段
+			recorderFront.setVideoSeconds(3 * 60);
+		} else {
+			recorderFront.setVideoSeconds(1 * 60);
+		}
+		recorderFront.setVideoOverlap(0); // 重叠
+		if (null != sharedPreferences) { // 录音
+			recorderFront.setMute(sharedPreferences.getBoolean("videoMute",
+					Constant.Record.muteDefault));
+		} else {
+			recorderFront.setMute(true);
+		}
+		recorderFront.setAudioSampleRate(48000);
 
-			// recorderFront.setSecondaryVideoEnable(true);
-			// recorderFront.setSecondaryVideoSize(640, 480);
-			// recorderFront.setSecondaryVideoBiteRate(120000);
-			// recorderFront.setSecondaryVideoFrameRate(10);
+		// recorderFront.setSecondaryVideoEnable(true);
+		// recorderFront.setSecondaryVideoSize(640, 480);
+		// recorderFront.setSecondaryVideoBiteRate(120000);
+		// recorderFront.setSecondaryVideoFrameRate(10);
 
-			adasInterface = new ADASInterface(480, 640, MainActivity.this);
-			adasInterface.setDebug(1);
-			adasInterface.setLane(ADASInterface.SET_ON);
-			adasInterface.setVehicle(ADASInterface.SET_ON);
+		adasInterface = new ADASInterface(480, 640, MainActivity.this);
+		adasInterface.setDebug(1);
+		adasInterface.setLane(ADASInterface.SET_ON);
+		adasInterface.setVehicle(ADASInterface.SET_ON);
 
-			recorderFront.setScaledStreamEnable(true, 640, 480);
-			recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
+		recorderFront.setScaledStreamEnable(true, 640, 480);
+		recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
 
-				@Override
-				public void onScaledStream(byte[] data, int width, int height) {
+			@Override
+			public void onScaledStream(byte[] data, int width, int height) {
 
-					Bitmap bmp = Bitmap.createBitmap(640, 480,
-							Bitmap.Config.ARGB_8888);
-					double[] output;
-					output = new double[256];
-					double speed = 100.0;
-					if (adasInterface.process_yuv(data, speed, output,
-							ADASInterface.YUV_FORMAT_YV12) == 0) {
-						Canvas mCanvas = new Canvas(bmp);
-						mCanvas.drawText("授权码错误", 10, 480 - 10, paint);
-					}
-					adasInterface.Draw(bmp, output);
-
-					imageAdas.setImageBitmap(bmp);
+				MyLog.i("[onScaledStream]");
+				double speed = 100.0;
+				if (adasInterface.process_yuv(data, speed, adasOutput,
+						ADASInterface.YUV_FORMAT_YV12) == 0) {
+					Canvas mCanvas = new Canvas(adasBitmap);
+					mCanvas.drawText("授权码错误", 10, 480 - 10, paint);
+					MyLog.e("[ADAS]Auth Fail");
 				}
-			});
+				adasInterface.Draw853480(adasBitmap, adasOutput);
 
-			recorderFront.prepare();
-		} catch (Exception e) {
-			MyLog.e("setupRecorder: Catch Exception：" + e.toString());
+				if (imageAdas == null) {
+					MyLog.i("[onScaledStream]imageAdas is NULL");
+					imageAdas = (ImageView) findViewById(R.id.imageAdas);
+				}
+				imageAdas.setImageBitmap(adasBitmap);
+			}
+		});
+
+		recorderFront.prepare();
+		// } catch (Exception e) {
+		// MyLog.e("setupRecorder: Catch Exception：" + e.toString());
+		// }
+	}
+
+	/** 保存一张bitmap */
+	private void saveOneBitmap(Bitmap bitmap) {
+		File file = new File(
+				"/storage/sdcard0/ADAS_"
+						+ new SimpleDateFormat("yyyyMMdd-HH-mm-ss-SSS",
+								Locale.CHINESE).format(new Date()));
+		if (file.exists()) {
+			file.delete();
+		}
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+			out.flush();
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

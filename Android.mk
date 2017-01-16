@@ -3,7 +3,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_STATIC_JAVA_LIBRARIES := sinosmart-adas
+LOCAL_STATIC_JAVA_LIBRARIES := sinosmart-adas opencv-3.1.0
 
 LOCAL_SRC_FILES := $(call all-subdir-java-files)
 
@@ -18,6 +18,7 @@ include $(BUILD_PACKAGE)
 
 include $(CLEAR_VARS) 
 
-LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := sinosmart-adas:libs/ADASInterface.jar
+LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := sinosmart-adas:libs/ADASInterface.jar \
+	opencv-3.1.0:libs/opencv-3.1.0.jar
 		
 include $(BUILD_MULTI_PREBUILT)	
