@@ -273,6 +273,7 @@ public class MainActivity extends Activity {
 		intentFilter.addAction(Constant.Broadcast.RELEASE_RECORD);
 		intentFilter.addAction(Constant.Broadcast.RELEASE_RECORD_TEST);
 		intentFilter.addAction("tchip.intent.action.MOVE_RECORD_BACK");
+		intentFilter.addAction(Constant.Broadcast.GPS_STATUS);
 		registerReceiver(mainReceiver, intentFilter);
 
 		// 接收额外信息
@@ -286,7 +287,7 @@ public class MainActivity extends Activity {
 				if ("autoui_oncreate".equals(reason)) { // 回到主界面
 					MyApp.shouldMountRecordFront = true;
 					MyApp.shouldMountRecordBack = true;
-					// new Thread(new BackHomeWhenBootThread()).start(); 
+					// new Thread(new BackHomeWhenBootThread()).start();
 				} else if ("acc_on".equals(reason)) {
 					MyApp.shouldMountRecordFront = true;
 					MyApp.shouldMountRecordBack = true;
@@ -671,6 +672,13 @@ public class MainActivity extends Activity {
 				killAutoRecordForTest();
 			} else if ("tchip.intent.action.MOVE_RECORD_BACK".equals(action)) {
 				moveTaskToBack(true);
+			} else if (Constant.Broadcast.GPS_STATUS.equals(action)) {
+				Bundle budle = intent.getExtras();
+				int speed = budle.getInt("speed");
+				double latitude = budle.getDouble("mlat");
+				double longitude = budle.getDouble("mLong");
+				MyLog.i("GPS", "speed:" + speed + ",latitude:" + latitude
+						+ ",longitude:" + longitude);
 			}
 		}
 	}
@@ -2952,8 +2960,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onScaledStream(byte[] data, int width, int height) {
-				MyLog.i("[onScaledStream]");
-
+				// MyLog.i("[onScaledStream]");
 				double speed = 80.0;
 
 				adasBitmap.eraseColor(Color.TRANSPARENT);
@@ -2961,7 +2968,7 @@ public class MainActivity extends Activity {
 						ADASInterface.YUV_FORMAT_YV12) == 0) {
 					Canvas mCanvas = new Canvas(adasBitmap);
 					mCanvas.drawText("授权码错误", 10, 480 - 10, paint);
-					MyLog.e("[ADAS]Auth Fail");
+					MyLog.e("ADAS", "Auth Fail");
 				}
 				adasInterface.Draw853480(adasBitmap, adasOutput);
 

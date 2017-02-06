@@ -8,9 +8,6 @@ public interface Constant {
 	/** Debug：打印Log */
 	public static final boolean isDebug = true;
 
-	/** 日志Tag */
-	public static final String TAG = "AZ";
-
 	/** SharedPreferences */
 	public static final class MySP {
 		/** 名称 */
@@ -52,6 +49,15 @@ public interface Constant {
 
 		/** 通知设置关闭GPS */
 		public static final String GPS_OFF = "tchip.intent.action.GPS_OFF";
+
+		/**
+		 * 经纬度和速度信息(by WWJ)，1s更新一次
+		 * 
+		 * @param [int]speed(0)
+		 * @param [double]mlat(-1)
+		 * @param [double]mLong(-1)
+		 */
+		public static final String GPS_STATUS = "com.tchip.GPS_STATUS";
 
 		/** TTS播报,Extra:content(String) */
 		public static final String TTS_SPEAK = "tchip.intent.action.TTS_SPEAK";

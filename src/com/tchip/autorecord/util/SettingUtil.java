@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.util.Log;
 
 public class SettingUtil {
 
@@ -71,13 +70,13 @@ public class SettingUtil {
 					output.close();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
-					Log.e(Constant.TAG, "SaveFileToNode:output error");
+					MyLog.e("[SettingUtil]SaveFileToNode:output error");
 				}
 			} catch (IOException e) {
-				Log.e(Constant.TAG, "SaveFileToNode:IO Exception");
+				MyLog.e("[SettingUtil]SaveFileToNode:IO Exception");
 			}
 		} else {
-			Log.e(Constant.TAG, "SaveFileToNode:File:" + file + "not exists");
+			MyLog.e("[SettingUtil]SaveFileToNode:File:" + file + "not exists");
 		}
 	}
 
