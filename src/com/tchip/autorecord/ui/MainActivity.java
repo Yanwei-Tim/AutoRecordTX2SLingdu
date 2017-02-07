@@ -151,6 +151,30 @@ public class MainActivity extends Activity {
 	// ADAS
 	private ADASInterface adasInterface;
 	private Bitmap adasBitmap;
+	/**
+	 * output 存储格式说明： A.前十位：
+	 * 
+	 * @param [0] 车道1起点X坐标
+	 * @param [1] 车道1起点Y坐标
+	 * @param [2] 车道1终点X坐标
+	 * @param [3] 车道1终点Y坐标
+	 * @param [4] 车道1偏离标识（1为偏离）
+	 * 
+	 * @param [5] 车道2起点X坐标
+	 * @param [6] 车道2起点Y坐标
+	 * @param [7] 车道2终点X坐标
+	 * @param [8] 车道2终点Y坐标
+	 * @param [9] 车道2偏离标识（1为偏离）
+	 * 
+	 *        B.数组索引号 9 以后存储的为车尾数据， 每 5 位存储一个车尾相关数据， 存储顺序为：
+	 * 
+	 * @param 车尾区域左上角x坐标
+	 * @param 车尾区域左上角y坐标
+	 * @param 车尾区域宽度
+	 * @param 车尾距离
+	 * @param 碰撞预警标识
+	 *            (1代表需要预警)
+	 */
 	private double[] adasOutput = new double[256];
 	private Paint paint;
 	private ImageView imageAdas;
@@ -365,6 +389,10 @@ public class MainActivity extends Activity {
 		// 关闭碰撞侦测服务
 		Intent intentCrash = new Intent(context, SensorWatchService.class);
 		stopService(intentCrash);
+
+		if (adasInterface != null) {
+			adasInterface.ReleaseInterface(); // 释放 ADAS，退出或创建新的对象前调用
+		}
 
 		if (mainReceiver != null) {
 			unregisterReceiver(mainReceiver);
@@ -2949,14 +2977,17 @@ public class MainActivity extends Activity {
 		}
 		recorderFront.setAudioSampleRate(48000);
 
+		adasInterface.ReleaseInterface(); // 释放 ADAS，退出或创建新的对象前调用
 		adasInterface = new ADASInterface(480, 640, MainActivity.this);
 		adasInterface.setDebug(1); // 绘制校准箭头
-		adasInterface.enableSound(ADASInterface.SET_ON); // 声音提示
+		adasInterface.enableSound(ADASInterface.SET_ON); // 开启声音提示
 		// adasInterface.setWarningSensitivity(level); // 设置提示级别
 		adasInterface.setLane(ADASInterface.SET_ON); // 车道偏离预警
 		adasInterface.setVehicle(ADASInterface.SET_ON); // 前车碰撞预警
+		// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
 		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
-		
+		// adasInterface.setSpeedThreshold(th); // 设置最低预警车速，低于该速度不预警
+		// adasInterface.reCalibration(); // 重新对该摄像头校准
 
 		recorderFront.setScaledStreamEnable(true, 640, 480);
 		recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
@@ -2970,7 +3001,7 @@ public class MainActivity extends Activity {
 				if (adasInterface.process_yuv(data, speed, adasOutput,
 						ADASInterface.YUV_FORMAT_YV12) == 0) {
 					Canvas mCanvas = new Canvas(adasBitmap);
-					mCanvas.drawText("授权码错误", 10, 480 - 100, paint);
+					mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
 					MyLog.e("ADAS", "Auth Fail");
 				} else {
 					// MyLog.i("ADAS", "Draw");
