@@ -146,7 +146,7 @@ public class MainActivity extends Activity {
 	/** UI配置 */
 	private UIConfig uiConfig = UIConfig.TQ6;
 	private int CAMERA_WIDTH = 1184;
-	private int CAMERA_HEIGHT = 480;
+	private int CAMERA_HEIGHT = 455; // 480;
 
 	// ADAS
 	private ADASInterface adasInterface;
@@ -189,7 +189,7 @@ public class MainActivity extends Activity {
 		}
 
 		CAMERA_WIDTH = 1280;
-		CAMERA_HEIGHT = 445;
+		CAMERA_HEIGHT = 455;
 		uiConfig = UIConfig.SL9;
 
 		if ("TX2S".equals(model)) {
@@ -2951,9 +2951,12 @@ public class MainActivity extends Activity {
 
 		adasInterface = new ADASInterface(480, 640, MainActivity.this);
 		adasInterface.setDebug(1); // 绘制校准箭头
-		adasInterface.enableSound(ADASInterface.SET_ON);
-		adasInterface.setLane(ADASInterface.SET_ON);
-		adasInterface.setVehicle(ADASInterface.SET_ON);
+		adasInterface.enableSound(ADASInterface.SET_ON); // 声音提示
+		// adasInterface.setWarningSensitivity(level); // 设置提示级别
+		adasInterface.setLane(ADASInterface.SET_ON); // 车道偏离预警
+		adasInterface.setVehicle(ADASInterface.SET_ON); // 前车碰撞预警
+		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
+		
 
 		recorderFront.setScaledStreamEnable(true, 640, 480);
 		recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
@@ -2967,8 +2970,10 @@ public class MainActivity extends Activity {
 				if (adasInterface.process_yuv(data, speed, adasOutput,
 						ADASInterface.YUV_FORMAT_YV12) == 0) {
 					Canvas mCanvas = new Canvas(adasBitmap);
-					mCanvas.drawText("授权码错误", 10, 480 - 10, paint);
+					mCanvas.drawText("授权码错误", 10, 480 - 100, paint);
 					MyLog.e("ADAS", "Auth Fail");
+				} else {
+					// MyLog.i("ADAS", "Draw");
 				}
 				adasInterface.Draw853480(adasBitmap, adasOutput);
 
@@ -3005,9 +3010,9 @@ public class MainActivity extends Activity {
 
 	private void saveOneYUVImage(byte[] data) {
 		File fileTmp = new File(
-				"/storage/sdcard0/YUVFile_"
-						+ new SimpleDateFormat("yyyyMMdd-HH-mm-ss",
-								Locale.CHINESE).format(new Date()));
+				"/storage/sdcard1/DrivingRecord/Image/"
+						+ new SimpleDateFormat("yyyy-MM-dd_HHmmss",
+								Locale.CHINESE).format(new Date()) + ".yuv");
 		try {
 			FileOutputStream fos = new FileOutputStream(fileTmp);
 			fos.write(data);
