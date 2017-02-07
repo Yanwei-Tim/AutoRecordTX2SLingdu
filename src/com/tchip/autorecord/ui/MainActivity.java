@@ -2977,13 +2977,13 @@ public class MainActivity extends Activity {
 		}
 		recorderFront.setAudioSampleRate(48000);
 
-		adasInterface.ReleaseInterface(); // 释放 ADAS，退出或创建新的对象前调用
 		adasInterface = new ADASInterface(480, 640, MainActivity.this);
 		adasInterface.setDebug(1); // 绘制校准箭头
 		adasInterface.enableSound(ADASInterface.SET_ON); // 开启声音提示
 		// adasInterface.setWarningSensitivity(level); // 设置提示级别
 		adasInterface.setLane(ADASInterface.SET_ON); // 车道偏离预警
 		adasInterface.setVehicle(ADASInterface.SET_ON); // 前车碰撞预警
+		adasInterface.CalibInfoSwitch(false); // 是否显示“调整摄像头角度,车身请勿超过红线”
 		// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
 		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
 		// adasInterface.setSpeedThreshold(th); // 设置最低预警车速，低于该速度不预警
