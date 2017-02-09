@@ -523,7 +523,9 @@ public class MainActivity extends Activity {
 			if (name.equals("state")) { // insert
 
 			} else { // update
-				if (Name.SET_DETECT_CRASH_STATE.equals(name)) {
+				if (name.startsWith("adas")) { // ADAS
+					setAdasConfig();
+				} else if (Name.SET_DETECT_CRASH_STATE.equals(name)) {
 					String strDetectCrashState = ProviderUtil.getValue(context,
 							Name.SET_DETECT_CRASH_STATE, "1");
 					if ("0".equals(strDetectCrashState)) {
@@ -2978,16 +2980,7 @@ public class MainActivity extends Activity {
 		recorderFront.setAudioSampleRate(48000);
 
 		adasInterface = new ADASInterface(480, 640, MainActivity.this);
-		adasInterface.setDebug(1); // 绘制校准箭头
-		adasInterface.enableSound(ADASInterface.SET_ON); // 开启声音提示
-		// adasInterface.setWarningSensitivity(level); // 设置提示级别
-		adasInterface.setLane(ADASInterface.SET_ON); // 车道偏离预警
-		adasInterface.setVehicle(ADASInterface.SET_ON); // 前车碰撞预警
-		adasInterface.CalibInfoSwitch(false); // 是否显示“调整摄像头角度,车身请勿超过红线”
-		// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
-		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
-		// adasInterface.setSpeedThreshold(th); // 设置最低预警车速，低于该速度不预警
-		// adasInterface.reCalibration(); // 重新对该摄像头校准
+		setAdasConfig();
 
 		recorderFront.setScaledStreamEnable(true, 640, 480);
 		recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
@@ -3016,6 +3009,35 @@ public class MainActivity extends Activity {
 		// } catch (Exception e) {
 		// MyLog.e("setupRecorder: Catch Exception：" + e.toString());
 		// }
+	}
+
+	/**
+	 * 设置ADAS参数
+	 */
+	private void setAdasConfig() {
+		adasInterface.setDebug(1); // 绘制校准箭头
+		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_SOUND, "1"))) {
+			adasInterface.enableSound(ADASInterface.SET_ON); // 开启声音提示
+			// adasInterface.setWarningSensitivity(level); // 设置提示级别
+		} else {
+			adasInterface.enableSound(ADASInterface.SET_OFF);
+		}
+		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_LINE, "1"))) {
+			adasInterface.setLane(ADASInterface.SET_ON); // 车道偏离预警
+		} else {
+			adasInterface.setLane(ADASInterface.SET_OFF);
+		}
+		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_VEHICLE, "1"))) {
+			adasInterface.setVehicle(ADASInterface.SET_ON); // 前车碰撞预警
+		} else {
+			adasInterface.setVehicle(ADASInterface.SET_OFF);
+		}
+		adasInterface.CalibInfoSwitch(false); // 是否显示“调整摄像头角度,车身请勿超过红线”
+		// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
+		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
+		// adasInterface.setSpeedThreshold(th); // 设置最低预警车速，低于该速度不预警
+		// adasInterface.reCalibration(); // 重新对该摄像头校准
+
 	}
 
 	/** 保存一张bitmap */

@@ -1,0 +1,112 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <!-- ADAS激活状态 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/adas_setting_item_height" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adas_title_auth"
+            android:textColor="@color/adas_setting_text_color"
+            android:textSize="@dimen/adas_setting_text_size" />
+
+        <TextView
+            android:id="@+id/textVerifyState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/adas_verify_fail_not_auth"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/adas_setting_text_size" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
+        android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
+        android:background="@color/adas_separtor_line_color" />
+
+    <!-- 车道偏离预警 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/adas_setting_item_height" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adas_title_line"
+            android:textColor="@color/adas_setting_text_color"
+            android:textSize="@dimen/adas_setting_text_size" />
+
+        <Switch
+            android:id="@+id/switchAdasLane"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
+        android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
+        android:background="@color/adas_separtor_line_color" />
+
+    <!-- 前车碰撞预警 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/adas_setting_item_height" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adas_title_vehicle"
+            android:textColor="@color/adas_setting_text_color"
+            android:textSize="@dimen/adas_setting_text_size" />
+
+        <Switch
+            android:id="@+id/switchAdasVehicle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
+        android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
+        android:background="@color/adas_separtor_line_color" />
+    <!-- 声音提示 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/adas_setting_item_height" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adas_title_sound"
+            android:textColor="@color/adas_setting_text_color"
+            android:textSize="@dimen/adas_setting_text_size" />
+
+        <Switch
+            android:id="@+id/switchAdasSound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
+</LinearLayout>

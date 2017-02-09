@@ -102,6 +102,15 @@ public class ProviderUtil {
 		/** 停车守卫 */
 		public static final String PARK_REC_STATE = "park_rec_state";
 
+		/** ADAS车道偏离预警开关:0,1 */
+		public static final String ADAS_LINE = "adas_line";
+
+		/** ADAS前车碰撞预警开关:0,1 */
+		public static final String ADAS_VEHICLE = "adas_vehicle";
+
+		/** ADAS声音开关:0,1 */
+		public static final String ADAS_SOUND = "adas_sound";
+
 	}
 
 	public static String getValue(Context context, String name,

@@ -42,6 +42,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.tchip.autorecord.ui.AdasSettingActivity"
+            android:exported="true" />
 
         <!--
         <provider
@@ -51,7 +54,7 @@
         <provider
             android:name="com.tchip.autorecord.db.BackVideoProvider"
             android:authorities="com.tchip.autorecord.db.BackVideoProvider"
-            android:exported="true" />
+            android:exported="true" />
         -->
 
         <receiver android:name="com.tchip.autorecord.receiver.CardEjectReceiver" >

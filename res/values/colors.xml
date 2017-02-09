@@ -7,5 +7,10 @@
     <color name="dialog_flash_clean_title">#eeeeee</color>
     <color name="dialog_flash_clean_message">#ffffff</color>
     <color name="dialog_flash_clean_button">#17ddcd</color>
+    
+    
+    <!-- ADAS Setting -->
+    <color name="adas_setting_text_color">#ffffff</color>
+    <color name="adas_separtor_line_color">#50ffffff</color>
 
 </resources>

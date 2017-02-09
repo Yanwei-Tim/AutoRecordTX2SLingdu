@@ -24,6 +24,7 @@ public interface Constant {
 
 		/** 是否开启后录[boolean:false] */
 		public static final String STR_SHOULD_RECORD_BACK = "shouldRecordBack";
+
 	}
 
 	/** 广播 */
