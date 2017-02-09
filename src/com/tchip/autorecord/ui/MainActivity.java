@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import com.sinosmart.adas.ADASInterface;
+import com.sinosmart.adas.LicenseInterface;
 import com.tchip.autorecord.Constant;
 import com.tchip.autorecord.MyApp;
 import com.tchip.autorecord.R;
@@ -26,6 +27,7 @@ import com.tchip.autorecord.util.ProviderUtil;
 import com.tchip.autorecord.util.ProviderUtil.Name;
 import com.tchip.autorecord.util.SettingUtil;
 import com.tchip.autorecord.util.StorageUtil;
+import com.tchip.autorecord.util.TelephonyUtil;
 import com.tchip.autorecord.view.BackLineView;
 import com.tchip.tachograph.ScaledStreamCallback;
 import com.tchip.tachograph.TachographCallback;
@@ -151,30 +153,7 @@ public class MainActivity extends Activity {
 	// ADAS
 	private ADASInterface adasInterface;
 	private Bitmap adasBitmap;
-	/**
-	 * output 存储格式说明： A.前十位：
-	 * 
-	 * @param [0] 车道1起点X坐标
-	 * @param [1] 车道1起点Y坐标
-	 * @param [2] 车道1终点X坐标
-	 * @param [3] 车道1终点Y坐标
-	 * @param [4] 车道1偏离标识（1为偏离）
-	 * 
-	 * @param [5] 车道2起点X坐标
-	 * @param [6] 车道2起点Y坐标
-	 * @param [7] 车道2终点X坐标
-	 * @param [8] 车道2终点Y坐标
-	 * @param [9] 车道2偏离标识（1为偏离）
-	 * 
-	 *        B.数组索引号 9 以后存储的为车尾数据， 每 5 位存储一个车尾相关数据， 存储顺序为：
-	 * 
-	 * @param 车尾区域左上角x坐标
-	 * @param 车尾区域左上角y坐标
-	 * @param 车尾区域宽度
-	 * @param 车尾距离
-	 * @param 碰撞预警标识
-	 *            (1代表需要预警)
-	 */
+
 	private double[] adasOutput = new double[256];
 	private Paint paint;
 	private ImageView imageAdas;
@@ -2995,9 +2974,37 @@ public class MainActivity extends Activity {
 						ADASInterface.YUV_FORMAT_YV12) == 0) {
 					Canvas mCanvas = new Canvas(adasBitmap);
 					mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
-					MyLog.e("ADAS", "Auth Fail");
+
+					authAdas();
 				} else {
 					// MyLog.i("ADAS", "Draw");
+					/**
+					 * output 存储格式说明： A.前十位：
+					 * 
+					 * @param [0] 车道1起点X坐标
+					 * @param [1] 车道1起点Y坐标
+					 * @param [2] 车道1终点X坐标
+					 * @param [3] 车道1终点Y坐标
+					 * @param [4] 车道1偏离标识（1为偏离）
+					 * 
+					 * @param [5] 车道2起点X坐标
+					 * @param [6] 车道2起点Y坐标
+					 * @param [7] 车道2终点X坐标
+					 * @param [8] 车道2终点Y坐标
+					 * @param [9] 车道2偏离标识（1为偏离）
+					 * 
+					 *        B.数组索引号 9 以后存储的为车尾数据， 每 5 位存储一个车尾相关数据， 存储顺序为：
+					 * 
+					 * @param 车尾区域左上角x坐标
+					 * @param 车尾区域左上角y坐标
+					 * @param 车尾区域宽度
+					 * @param 车尾距离
+					 * @param 碰撞预警标识
+					 *            (1代表需要预警)
+					 */
+					if (adasOutput[4] == 1) {
+
+					}
 				}
 				adasInterface.Draw853480(adasBitmap, adasOutput);
 
@@ -3037,6 +3044,31 @@ public class MainActivity extends Activity {
 		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
 		// adasInterface.setSpeedThreshold(th); // 设置最低预警车速，低于该速度不预警
 		// adasInterface.reCalibration(); // 重新对该摄像头校准
+	}
+
+	private void authAdas() {
+		if (TelephonyUtil.isNetworkConnected(context)
+				&& !ClickUtil.isAuthAdasTooQuick(5000)) {
+			MyLog.e("ADAS", "Auth Fail,re auth ADAS");
+			new Thread(new AuthAdasThread()).start();
+		}
+	}
+
+	class AuthAdasThread implements Runnable {
+
+		@Override
+		public void run() {
+			LicenseInterface licenseInterface = new LicenseInterface();
+			if (licenseInterface.isLicensed(context)) {
+			} else {
+				int licenseState = licenseInterface.getLicense(context);
+				MyLog.i("[ADAS]licenseState:" + licenseState);
+				if (4 == licenseState) {
+					int restoreState = licenseInterface.restoreLicense(context);
+					MyLog.i("[ADAS]restoreState:" + restoreState);
+				}
+			}
+		}
 
 	}
 

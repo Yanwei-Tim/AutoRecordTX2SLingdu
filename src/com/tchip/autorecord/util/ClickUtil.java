@@ -92,6 +92,19 @@ public class ClickUtil {
 		return false;
 	}
 
+	private static long lastAuthAdasTime;
+
+	/** 是否授权ADAS过快 */
+	public static boolean isAuthAdasTooQuick(int runMinSpan) {
+		long time = System.currentTimeMillis();
+		long timeD = time - lastAuthAdasTime;
+		if (0 < timeD && timeD < runMinSpan) {
+			return true;
+		}
+		lastAuthAdasTime = time;
+		return false;
+	}
+
 	/**
 	 * 传递过来的Intent是否是最近传递过来
 	 * 
@@ -108,7 +121,7 @@ public class ClickUtil {
 			return false;
 		}
 	}
-	
+
 	/** 上次倒车时间 */
 	private static long lastBackTime;
 

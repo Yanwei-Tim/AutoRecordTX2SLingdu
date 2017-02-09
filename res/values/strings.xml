@@ -73,16 +73,13 @@
     <string name="adas_title_line">车道偏离预警</string>
     <string name="adas_title_vehicle">前车碰撞预警</string>
     <string name="adas_title_sound">声音提示</string>
-    <string name="adas_verify_ok">认证成功</string>
-    <string name="adas_verify_fail_not_auth">认证失败，未授权</string>
-    <string name="adas_verify_fail_out_of_number">认证失败，授权数已用完</string>
-    <string name="adas_verify_fail_server_error">认证失败，服务器异常</string>
-    <string name="adas_verify_fail_check_network">认证失败，请检查网络</string>
-    <string name="adas_verify_fail_server_close">授权服务端未开启</string>
-    <string name="adas_restore_fail_no_item">恢复授权失败，未找到记录</string>
+    <string name="adas_verify_ok">授权成功</string>
+    <string name="adas_verify_fail_not_auth">授权失败，设备未授权</string>
+    <string name="adas_verify_fail_out_of_number">授权失败，授权数已用完</string>
+    <string name="adas_verify_fail_server_error">授权失败，服务器异常</string>
+    <string name="adas_already_auth_restore">设备已授权，请恢复</string>
+    <string name="adas_restore_fail_no_item">授权恢复失败，未找到授权记录</string>
     <string name="adas_restore_fail_too_frequency">恢复授权失败，恢复过频繁</string>
-    <string name="adas_verify_no_auth_device">未发现授权设备</string>
-    <string name="adas_get_device_info_error">获取设备信息出错</string>
-    <string name="adas_already_auth_restore">已授权， 如果不能正常使用，请使用授权恢复</string>
+    <string name="adas_verify_fail_check_network">网络错误</string>
 
 </resources>

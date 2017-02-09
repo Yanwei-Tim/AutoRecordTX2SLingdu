@@ -120,159 +120,62 @@ public class AdasSettingActivity extends Activity {
 			textVerifyState.setText(getResources().getString(
 					R.string.adas_verify_ok));
 		} else {
-			/**
-			 * 1） "认证成功"
-			 * 
-			 * 2） "认证失败， 手机未授权"
-			 * 
-			 * 3） "认证失败， 授权数已用完"
-			 * 
-			 * 4） "认证失败， 服务器异常"
-			 * 
-			 * 5） "已授权， 如果不能正常使用， 请使用授权恢复"
-			 * 
-			 * 6） "认证失败， 请检查网络"
-			 * 
-			 * 7） "网络错误"
-			 * 
-			 * 8） "授权服务端未开启"
-			 * 
-			 * 9） "未发现授权设备"
-			 * 
-			 * 10） "获取设备信息出错"
-			 */
 			int licenseState = licenseInterface.getLicense(context);
 			MyLog.i("[ADAS]licenseState:" + licenseState);
-			switch (licenseState) {
-			case 1:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_verify_ok));
-				break;
 
-			case 2:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_verify_fail_not_auth));
-				break;
-
-			case 3:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_verify_fail_out_of_number));
-				break;
-
-			case 4:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_verify_fail_server_error));
-				break;
-
-			case 5:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_already_auth_restore));
-				/**
-				 * 1） "认证成功"
-				 * 
-				 * 2） "认证失败， 手机未授权"
-				 * 
-				 * 3） "认证失败， 授权数已用完"
-				 * 
-				 * 4） "认证失败， 服务器异常"
-				 * 
-				 * 5） "恢复授权失败， 未找到记录"
-				 * 
-				 * 6） "恢复授权失败， 恢复过频繁"
-				 * 
-				 * 7） "认证失败， 请检查网络"
-				 * 
-				 * 8） "网络错误"
-				 * 
-				 * 9） "授权服务端未开启"
-				 * 
-				 * 10） "未发现授权设备"
-				 * 
-				 * 11） "获取设备信息出错"
-				 */
+			textVerifyState.setText(getDescriptionByCode(licenseState));
+			if (4 == licenseState) {
 				int restoreState = licenseInterface.restoreLicense(context);
 				MyLog.i("[ADAS]restoreState:" + restoreState);
-				switch (restoreState) {
-				case 1:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_verify_ok));
-					break;
-
-				case 2:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_verify_fail_not_auth));
-					break;
-
-				case 3:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_verify_fail_out_of_number));
-					break;
-
-				case 4:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_verify_fail_server_error));
-					break;
-
-				case 5:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_restore_fail_no_item));
-					break;
-
-				case 6:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_restore_fail_too_frequency));
-					break;
-
-				case 7:
-				case 8:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_verify_fail_check_network));
-					break;
-
-				case 9:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_verify_fail_server_close));
-					break;
-
-				case 10:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_verify_no_auth_device));
-					break;
-
-				case 11:
-					textVerifyState.setText(getResources().getString(
-							R.string.adas_get_device_info_error));
-					break;
-
-				default:
-					break;
-				}
-
-			case 6:
-			case 7:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_verify_fail_check_network));
-				break;
-
-			case 8:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_verify_fail_server_close));
-				break;
-
-			case 9:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_verify_no_auth_device));
-				break;
-
-			case 10:
-				textVerifyState.setText(getResources().getString(
-						R.string.adas_get_device_info_error));
-				break;
-
-			default:
-				break;
+				textVerifyState.setText(getDescriptionByCode(restoreState));
 			}
 		}
 	}
 
+	/**
+	 * @param 0 ：授权成功
+	 * @param 1 ：授权失败，设备未授权
+	 * @param 2 ：授权失败，授权数已用完
+	 * @param 3 ：授权失败，服务器异常
+	 * @param 4 ：设备已授权
+	 * @param 5 ：授权恢复失败，未找到授权记录
+	 * @param 6 ：授权恢复失败，恢复过频繁
+	 * @param 201 ：网络错误
+	 * 
+	 * @return
+	 */
+	private String getDescriptionByCode(int code) {
+		switch (code) {
+		case 0:
+			return getResources().getString(R.string.adas_verify_ok);
+
+		case 1:
+			return getResources().getString(R.string.adas_verify_fail_not_auth);
+
+		case 2:
+			return getResources().getString(
+					R.string.adas_verify_fail_out_of_number);
+
+		case 3:
+			return getResources().getString(
+					R.string.adas_verify_fail_server_error);
+
+		case 4:
+			return getResources().getString(R.string.adas_already_auth_restore);
+
+		case 5:
+			return getResources().getString(R.string.adas_restore_fail_no_item);
+
+		case 6:
+			return getResources().getString(
+					R.string.adas_restore_fail_too_frequency);
+
+		case 201:
+			return getResources().getString(
+					R.string.adas_verify_fail_check_network);
+
+		default:
+			return "";
+		}
+	}
 }
