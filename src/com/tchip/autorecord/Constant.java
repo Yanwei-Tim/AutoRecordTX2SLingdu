@@ -153,6 +153,19 @@ public interface Constant {
 		 */
 		public static final String ACTION_IMAGE_SAVE = "tchip.intent.action.ACTION_IMAGE_SAVE";
 
+		/**
+		 * ADAS
+		 * 
+		 * Extra:type(String)
+		 * 
+		 * @param right
+		 *            右车道偏离预警
+		 * @param left
+		 *            左车道偏离预警
+		 * @param front
+		 *            前车碰撞预警
+		 */
+		public static final String ADAS_MSG = "tchip.intent.action.ADAS_MSG";
 	}
 
 	public static final class GravitySensor {
