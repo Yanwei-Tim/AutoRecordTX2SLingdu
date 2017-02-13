@@ -158,6 +158,11 @@ public class MainActivity extends Activity {
 	private Paint paint;
 	private ImageView imageAdas;
 
+	// 当前速度
+	private int nowSpeed = 0;
+	private double nowLatitude = 0.0;
+	private double nowLongitude = 0.0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -683,11 +688,11 @@ public class MainActivity extends Activity {
 				moveTaskToBack(true);
 			} else if (Constant.Broadcast.GPS_STATUS.equals(action)) {
 				Bundle budle = intent.getExtras();
-				int speed = budle.getInt("speed");
-				double latitude = budle.getDouble("mlat");
-				double longitude = budle.getDouble("mLong");
-				MyLog.i("GPS", "speed:" + speed + ",latitude:" + latitude
-						+ ",longitude:" + longitude);
+				nowSpeed = budle.getInt("speed");
+				nowLatitude = budle.getDouble("mlat");
+				nowLongitude = budle.getDouble("mLong");
+				MyLog.i("GPS", "speed:" + nowSpeed + ",latitude:" + nowLatitude
+						+ ",longitude:" + nowLongitude);
 			}
 		}
 	}
@@ -2967,7 +2972,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onScaledStream(byte[] data, int width, int height) {
 				// MyLog.i("[onScaledStream]");
-				double speed = 80.0;
+				double speed = nowSpeed;
+				if ("1".equals(ProviderUtil.getValue(context,
+						Name.ADAS_INDOOR_DEBUG, "0"))) {
+					speed = 80.0;
+				}
 
 				adasBitmap.eraseColor(Color.TRANSPARENT);
 				if (adasInterface.process_yuv(data, speed, adasOutput,
@@ -3056,7 +3065,12 @@ public class MainActivity extends Activity {
 		} else {
 			adasInterface.setVehicle(ADASInterface.SET_OFF);
 		}
-		adasInterface.CalibInfoSwitch(false); // 是否显示“调整摄像头角度,车身请勿超过红线”
+		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_ANGLE_ADJUST,
+				"0"))) {
+			adasInterface.CalibInfoSwitch(true); // 是否显示“调整摄像头角度,车身请勿超过红线”
+		} else {
+			adasInterface.CalibInfoSwitch(false);
+		}
 		// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
 		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
 		// adasInterface.setSpeedThreshold(th); // 设置最低预警车速，低于该速度不预警

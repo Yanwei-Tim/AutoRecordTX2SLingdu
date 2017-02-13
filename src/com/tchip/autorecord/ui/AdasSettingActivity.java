@@ -35,6 +35,16 @@ public class AdasSettingActivity extends Activity {
 	 */
 	private Switch switchAdasSound;
 
+	/**
+	 * 室内调试
+	 */
+	private Switch switchAdasIndoor;
+	
+	/**
+	 * 摄像头角度调整辅助线
+	 */
+	private Switch switchAngleAdjust;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -113,6 +123,33 @@ public class AdasSettingActivity extends Activity {
 					}
 				});
 
+		switchAdasIndoor = (Switch) findViewById(R.id.switchAdasIndoor);
+		switchAdasIndoor.setChecked("1".equals(ProviderUtil.getValue(context,
+				Name.ADAS_INDOOR_DEBUG, "0")));
+		switchAdasIndoor
+				.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView,
+							boolean isChecked) {
+						ProviderUtil.setValue(context, Name.ADAS_INDOOR_DEBUG,
+								isChecked ? "1" : "0");
+					}
+				});
+
+		
+		switchAngleAdjust = (Switch) findViewById(R.id.switchAngleAdjust);
+		switchAngleAdjust.setChecked("1".equals(ProviderUtil.getValue(context,
+				Name.ADAS_ANGLE_ADJUST, "0")));
+		switchAngleAdjust.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				ProviderUtil.setValue(context, Name.ADAS_ANGLE_ADJUST,
+						isChecked ? "1" : "0");
+			}
+		});
+		
 	}
 
 	private void checkAdasLicensed(Context context) {

@@ -69,10 +69,13 @@
 
     <!-- ADAS -->
     <string name="adas_setting_title">ADAS设置</string>
-    <string name="adas_title_auth">ADAS授权 </string>
+    <string name="adas_title_auth_state">ADAS授权状态 </string>
     <string name="adas_title_line">车道偏离预警</string>
     <string name="adas_title_vehicle">前车碰撞预警</string>
     <string name="adas_title_sound">声音提示</string>
+    <string name="adas_angle_adjust">摄像头角度调整辅助线</string>
+    <string name="adas_indoor_debug">室内调试</string>
+    <string name="adas_indoor_debug_hint">（固定速度 80Km/h）</string>
     <string name="adas_verify_ok">授权成功</string>
     <string name="adas_verify_fail_not_auth">授权失败，设备未授权</string>
     <string name="adas_verify_fail_out_of_number">授权失败，授权数已用完</string>
