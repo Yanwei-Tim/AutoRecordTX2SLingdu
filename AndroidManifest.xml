@@ -12,6 +12,8 @@
 
     <uses-feature android:name="android.hardware.camera" />
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -54,7 +56,7 @@
         <provider
             android:name="com.tchip.autorecord.db.BackVideoProvider"
             android:authorities="com.tchip.autorecord.db.BackVideoProvider"
-            android:exported="true" />
+            android:exported="true" />
         -->
 
         <receiver android:name="com.tchip.autorecord.receiver.CardEjectReceiver" >

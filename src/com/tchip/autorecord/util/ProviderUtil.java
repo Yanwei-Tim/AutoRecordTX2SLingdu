@@ -137,7 +137,6 @@ public class ProviderUtil {
 			MyLog.e("ProviderUtil.get " + name + " Value Exception:"
 					+ e.toString());
 		}
-		MyLog.v("ProviderUtil.getValue.Name:" + name + ",value:" + dbValue);
 		return dbValue;
 	}
 
