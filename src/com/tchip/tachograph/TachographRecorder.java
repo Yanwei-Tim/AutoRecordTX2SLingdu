@@ -99,6 +99,12 @@ public class TachographRecorder {
 	public native int getVersionCode();
 
 	public native String getVersionName();
+	
+	public native int setSpeed(int speed);
+	
+	public native int setLat(String latitude);
+	
+	public native int setLong(String longitude);
 
 	private static native final void native_init();
 

@@ -438,6 +438,13 @@ public class MainActivity extends Activity {
 		nowLatitude = location.getLatitude();
 		nowLongitude = location.getLongitude();
 		MyLog.i("GPS", "Speed:" + nowSpeed);
+		if (recorderFront != null) {
+			if (nowSpeed > 0) {
+				recorderFront.setSpeed(nowSpeed);
+			}
+			recorderFront.setLat(nowLatitude + "");
+			recorderFront.setLong(nowLongitude + "");
+		}
 	}
 
 	// 位置监听
