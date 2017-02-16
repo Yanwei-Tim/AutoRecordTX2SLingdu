@@ -140,21 +140,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/icon_area_height"
-                    android:layout_centerInParent="true" >
-
-                    <ImageButton
-                        android:id="@+id/imageBackState"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@null"
-                        android:src="@drawable/video_start" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/icon_area_height"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="@dimen/icon_area_margin_top_bottom" >
 

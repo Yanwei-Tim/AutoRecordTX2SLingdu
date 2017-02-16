@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
 	private RelativeLayout layoutBack;
 	private RelativeLayout layoutBackRecord;
 	private TextView textBackTime;
-	private ImageButton imageBackState;
+	// private ImageButton imageBackState;
 	private ImageButton imageBackLock;
 	private TextView textBackLock;
 	private ImageButton imageBackSwitch;
@@ -1140,8 +1140,8 @@ public class MainActivity extends Activity {
 		imageFrontState = (ImageButton) findViewById(R.id.imageFrontState);
 		imageFrontState.setOnClickListener(myOnClickListener);
 
-		imageBackState = (ImageButton) findViewById(R.id.imageBackState);
-		imageBackState.setOnClickListener(myOnClickListener);
+		// imageBackState = (ImageButton) findViewById(R.id.imageBackState);
+		// imageBackState.setOnClickListener(myOnClickListener);
 
 		// 锁定
 		imageFrontLock = (ImageButton) findViewById(R.id.imageFrontLock);
@@ -1374,11 +1374,7 @@ public class MainActivity extends Activity {
 							noVideoSDHint();
 						}
 					}
-				}
-				break;
 
-			case R.id.imageBackState:
-				if (!ClickUtil.isQuickClick(1000)) {
 					if (shouldRecordBack()) { // 后录功能开启
 						if (MyApp.isBackRecording) {
 							speakVoice(getResources().getString(
@@ -1467,8 +1463,15 @@ public class MainActivity extends Activity {
 								});
 						builder.create().show();
 					}
+
 				}
 				break;
+
+			// case R.id.imageBackState:
+			// if (!ClickUtil.isQuickClick(1000)) {
+			//
+			// }
+			// break;
 
 			case R.id.imageFrontLock:
 			case R.id.textFrontLock:
@@ -2046,9 +2049,9 @@ public class MainActivity extends Activity {
 
 	private void setupBackViews() {
 		// 录像按钮
-		imageBackState.setImageDrawable(getResources().getDrawable(
-				MyApp.isBackRecording ? R.drawable.video_stop
-						: R.drawable.video_start, null));
+		// imageBackState.setImageDrawable(getResources().getDrawable(
+		// MyApp.isBackRecording ? R.drawable.video_stop
+		// : R.drawable.video_start, null));
 		// 视频加锁
 		imageBackLock.setImageDrawable(getResources().getDrawable(
 				MyApp.isBackLock ? R.drawable.video_lock
