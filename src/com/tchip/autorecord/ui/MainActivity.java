@@ -1377,8 +1377,6 @@ public class MainActivity extends Activity {
 
 					if (shouldRecordBack()) { // 后录功能开启
 						if (MyApp.isBackRecording) {
-							speakVoice(getResources().getString(
-									R.string.hint_back_record_stop));
 							MyLog.v("[onClick]stopRecorder()");
 							// stopBackRecorder5Times();
 							if (stopBackRecorder() == 0) {
@@ -1400,8 +1398,6 @@ public class MainActivity extends Activity {
 									ProviderUtil.setValue(context,
 											Name.REC_BACK_STATE, "0");
 								}
-								speakVoice(getResources().getString(
-										R.string.hint_back_record_start));
 								startRecordBack();
 							} else {
 								noVideoSDHint();
@@ -1452,9 +1448,6 @@ public class MainActivity extends Activity {
 														Name.REC_BACK_STATE,
 														"0");
 											}
-											speakVoice(getResources()
-													.getString(
-															R.string.hint_back_record_start));
 											startRecordBack();
 										} else {
 											noVideoSDHint();
