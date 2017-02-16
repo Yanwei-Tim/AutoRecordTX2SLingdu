@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -167,7 +168,8 @@ public class MainActivity extends Activity {
 	private ImageView imageAdas;
 
 	// 当前速度
-	private int nowSpeed = 0;
+	private int adasSpeed = 0;
+	private int recordSpeed = 0;
 	private double nowLatitude = 0.0;
 	private double nowLongitude = 0.0;
 
@@ -228,7 +230,7 @@ public class MainActivity extends Activity {
 		powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE); // 获取屏幕状态
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE); // 位置
 		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			// TODO:
+			// TODO: Open GPS
 		} else {
 			String bestProvider = locationManager.getBestProvider(
 					getLocationCriteria(), true);
@@ -434,16 +436,23 @@ public class MainActivity extends Activity {
 	}
 
 	private void updateSpeedByLocation(Location location) {
-		nowSpeed = (int) (location.getSpeed() * 3.6); // m/s --> Km/h
+		int tempSpeed = (int) (location.getSpeed() * 3.6); // m/s --> Km/h
+		adasSpeed = tempSpeed;
+		recordSpeed = tempSpeed;
+
 		nowLatitude = location.getLatitude();
 		nowLongitude = location.getLongitude();
-		MyLog.i("GPS", "Speed:" + nowSpeed);
+
+		MyLog.i("GPS", "Speed:" + tempSpeed);
 		if (recorderFront != null) {
-			if (nowSpeed > 0) {
-				recorderFront.setSpeed(nowSpeed);
+			if (recordSpeed > 0) {
+				recorderFront.setSpeed(recordSpeed);
+				recordSpeed = 0; // 清除速度
 			}
-			recorderFront.setLat(nowLatitude + "");
-			recorderFront.setLong(nowLongitude + "");
+			recorderFront.setLat(new DecimalFormat("#.00000")
+					.format(nowLatitude) + "");
+			recorderFront.setLong(new DecimalFormat("#.00000")
+					.format(nowLongitude) + "");
 		}
 	}
 
@@ -3119,69 +3128,71 @@ public class MainActivity extends Activity {
 			@Override
 			public void onScaledStream(byte[] data, int width, int height) {
 				// MyLog.i("[onScaledStream]");
-				double speed = nowSpeed;
-				if ("1".equals(ProviderUtil.getValue(context,
-						Name.ADAS_INDOOR_DEBUG, "0"))) {
-					speed = 80.0;
+				if (MyApp.isAccOn) {
+					double speed = adasSpeed;
+					adasSpeed = 0; // 清除
+					if ("1".equals(ProviderUtil.getValue(context,
+							Name.ADAS_INDOOR_DEBUG, "0"))) {
+						speed = 80.0;
+					}
+
+					adasBitmap.eraseColor(Color.TRANSPARENT);
+					if (adasInterface.process_yuv(data, speed, adasOutput,
+							ADASInterface.YUV_FORMAT_YV12) == 0) {
+						Canvas mCanvas = new Canvas(adasBitmap);
+						mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
+
+						authAdas();
+					} else {
+						// MyLog.i("ADAS", "Draw");
+						/**
+						 * output 存储格式说明： A.前十位：
+						 * 
+						 * @param [0] 车道1起点X坐标
+						 * @param [1] 车道1起点Y坐标
+						 * @param [2] 车道1终点X坐标
+						 * @param [3] 车道1终点Y坐标
+						 * @param [4] 车道1偏离标识（1为偏离）
+						 * 
+						 * @param [5] 车道2起点X坐标
+						 * @param [6] 车道2起点Y坐标
+						 * @param [7] 车道2终点X坐标
+						 * @param [8] 车道2终点Y坐标
+						 * @param [9] 车道2偏离标识（1为偏离）
+						 * 
+						 *        B.数组索引号 9 以后存储的为车尾数据， 每 5 位存储一个车尾相关数据， 存储顺序为：
+						 * 
+						 * @param 车尾区域左上角x坐标
+						 * @param 车尾区域左上角y坐标
+						 * @param 车尾区域宽度
+						 * @param 车尾距离
+						 * @param 碰撞预警标识
+						 *            (1代表需要预警)
+						 */
+						if (adasOutput.length >= 4 && adasOutput[4] == 1) {
+							MyLog.i("ADAS", "[4] == 1");
+							context.sendBroadcast(new Intent(
+									Constant.Broadcast.ADAS_MSG).putExtra(
+									"type", "right"));
+						}
+
+						if (adasOutput.length >= 9 && adasOutput[9] == 1) {
+							MyLog.i("ADAS", "[9] == 1");
+							context.sendBroadcast(new Intent(
+									Constant.Broadcast.ADAS_MSG).putExtra(
+									"type", "left"));
+						}
+
+						if (adasOutput.length >= 14 && adasOutput[14] == 1) {
+							MyLog.i("ADAS", "[14] == 1");
+							context.sendBroadcast(new Intent(
+									Constant.Broadcast.ADAS_MSG).putExtra(
+									"type", "front"));
+						}
+					}
+					adasInterface.Draw853480(adasBitmap, adasOutput);
+					imageAdas.setImageBitmap(adasBitmap);
 				}
-
-				adasBitmap.eraseColor(Color.TRANSPARENT);
-				if (adasInterface.process_yuv(data, speed, adasOutput,
-						ADASInterface.YUV_FORMAT_YV12) == 0) {
-					Canvas mCanvas = new Canvas(adasBitmap);
-					mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
-
-					authAdas();
-				} else {
-					// MyLog.i("ADAS", "Draw");
-					/**
-					 * output 存储格式说明： A.前十位：
-					 * 
-					 * @param [0] 车道1起点X坐标
-					 * @param [1] 车道1起点Y坐标
-					 * @param [2] 车道1终点X坐标
-					 * @param [3] 车道1终点Y坐标
-					 * @param [4] 车道1偏离标识（1为偏离）
-					 * 
-					 * @param [5] 车道2起点X坐标
-					 * @param [6] 车道2起点Y坐标
-					 * @param [7] 车道2终点X坐标
-					 * @param [8] 车道2终点Y坐标
-					 * @param [9] 车道2偏离标识（1为偏离）
-					 * 
-					 *        B.数组索引号 9 以后存储的为车尾数据， 每 5 位存储一个车尾相关数据， 存储顺序为：
-					 * 
-					 * @param 车尾区域左上角x坐标
-					 * @param 车尾区域左上角y坐标
-					 * @param 车尾区域宽度
-					 * @param 车尾距离
-					 * @param 碰撞预警标识
-					 *            (1代表需要预警)
-					 */
-					if (adasOutput.length >= 4 && adasOutput[4] == 1) {
-						MyLog.i("ADAS", "[4] == 1");
-						context.sendBroadcast(new Intent(
-								Constant.Broadcast.ADAS_MSG).putExtra("type",
-								"right"));
-					}
-
-					if (adasOutput.length >= 9 && adasOutput[9] == 1) {
-						MyLog.i("ADAS", "[9] == 1");
-						context.sendBroadcast(new Intent(
-								Constant.Broadcast.ADAS_MSG).putExtra("type",
-								"left"));
-					}
-
-					if (adasOutput.length >= 14 && adasOutput[14] == 1) {
-						MyLog.i("ADAS", "[14] == 1");
-						context.sendBroadcast(new Intent(
-								Constant.Broadcast.ADAS_MSG).putExtra("type",
-								"front"));
-					}
-				}
-				adasInterface.Draw853480(adasBitmap, adasOutput);
-
-				imageAdas.setImageBitmap(adasBitmap);
 			}
 		});
 
@@ -3198,7 +3209,6 @@ public class MainActivity extends Activity {
 		adasInterface.setDebug(1); // 绘制校准箭头
 		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_SOUND, "1"))) {
 			adasInterface.enableSound(ADASInterface.SET_ON); // 开启声音提示
-			// adasInterface.setWarningSensitivity(level); // 设置提示级别
 		} else {
 			adasInterface.enableSound(ADASInterface.SET_OFF);
 		}
@@ -3218,9 +3228,31 @@ public class MainActivity extends Activity {
 		} else {
 			adasInterface.CalibInfoSwitch(false);
 		}
+
+		String adasSensity = ProviderUtil.getValue(context, Name.ADAS_SENSITY,
+				"1"); // 设置预警灵敏度
+		if ("0".equals(adasSensity)) { // 低
+			adasInterface.setWarningSensitivity(0);
+		} else if ("2".equals(adasSensity)) { // 高
+			adasInterface.setWarningSensitivity(2);
+		} else { // 中
+			adasInterface.setWarningSensitivity(1);
+		}
+
+		String adasThreshold = ProviderUtil.getValue(context,
+				Name.ADAS_THRESHOLD, "20"); // 设置最低预警车速，低于该速度不预警
+		if ("0".equals(adasThreshold)) {
+			adasInterface.setSpeedThreshold(0);
+		} else if ("50".equals(adasThreshold)) {
+			adasInterface.setSpeedThreshold(50);
+		} else if ("80".equals(adasThreshold)) {
+			adasInterface.setSpeedThreshold(80);
+		} else {
+			adasInterface.setSpeedThreshold(20);
+		}
+
 		// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
 		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
-		// adasInterface.setSpeedThreshold(th); // 设置最低预警车速，低于该速度不预警
 		// adasInterface.reCalibration(); // 重新对该摄像头校准
 	}
 

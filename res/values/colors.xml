@@ -11,6 +11,8 @@
     
     <!-- ADAS Setting -->
     <color name="adas_setting_text_color">#ffffff</color>
+    <color name="adas_setting_text_color_dark">#50ffffff</color>
     <color name="adas_separtor_line_color">#50ffffff</color>
+    <color name="adas_setting_item_bg">#50ffffff</color>
 
 </resources>

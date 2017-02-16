@@ -110,10 +110,16 @@ public class ProviderUtil {
 
 		/** ADAS声音开关:0,1 */
 		public static final String ADAS_SOUND = "adas_sound";
-		
+
 		public static final String ADAS_INDOOR_DEBUG = "adas_indoor_debug";
-		
+
 		public static final String ADAS_ANGLE_ADJUST = "adas_angle_adjust";
+
+		/** 预警灵敏度: 0-低 1-中(默认) 2-高 */
+		public static final String ADAS_SENSITY = "adas_sensity";
+
+		/** 预警门限速度:默认20（km/h） */
+		public static final String ADAS_THRESHOLD = "adas_threshold";
 
 	}
 

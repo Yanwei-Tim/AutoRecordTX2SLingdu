@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#000000"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:paddingTop="10px" >
 
     <ScrollView
         android:layout_width="match_parent"
@@ -16,172 +16,335 @@
             android:background="#000000"
             android:orientation="vertical" >
 
-            <!-- ADAS激活状态 -->
-
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/adas_setting_item_height" >
+                android:layout_height="@dimen/adas_setting_item_height"
+                android:layout_marginBottom="@dimen/adas_setting_item_margin_vertical"
+                android:orientation="horizontal" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/adas_title_auth_state"
-                    android:textColor="@color/adas_setting_text_color"
-                    android:textSize="@dimen/adas_setting_text_size" />
+                <!-- ADAS激活状态 -->
 
-                <TextView
-                    android:id="@+id/textVerifyState"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:text="@string/adas_verify_fail_not_auth"
-                    android:textColor="#ffffff"
-                    android:textSize="@dimen/adas_setting_text_size" />
-            </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginRight="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
 
-            <View
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_title_auth_state"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
+
+                    <TextView
+                        android:id="@+id/textVerifyState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:text="@string/adas_verify_fail_not_auth"
+                        android:textColor="@color/adas_setting_text_color_dark"
+                        android:textSize="@dimen/adas_setting_text_size" />
+                </RelativeLayout>
+
+                <!-- 声音提示 -->
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginLeft="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_title_sound"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
+
+                    <Switch
+                        android:id="@+id/switchAdasSound"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
-                android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
-                android:background="@color/adas_separtor_line_color" />
+                android:layout_height="@dimen/adas_setting_item_height"
+                android:layout_marginBottom="@dimen/adas_setting_item_margin_vertical"
+                android:orientation="horizontal" >
 
-            <!-- 车道偏离预警 -->
+                <!-- 车道偏离预警 -->
 
-            <RelativeLayout
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginRight="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_title_line"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
+
+                    <Switch
+                        android:id="@+id/switchAdasLane"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
+
+                <!-- 前车碰撞预警 -->
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginLeft="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_title_vehicle"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
+
+                    <Switch
+                        android:id="@+id/switchAdasVehicle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/adas_setting_item_height" >
+                android:layout_height="@dimen/adas_setting_item_height"
+                android:layout_marginBottom="@dimen/adas_setting_item_margin_vertical"
+                android:orientation="horizontal" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/adas_title_line"
-                    android:textColor="@color/adas_setting_text_color"
-                    android:textSize="@dimen/adas_setting_text_size" />
+                <!-- ADAS灵敏度 -->
 
-                <Switch
-                    android:id="@+id/switchAdasLane"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginRight="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
 
-            <View
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_title_sensity"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
+
+                    <RadioGroup
+                        android:id="@+id/groupSensity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:orientation="horizontal" >
+
+                        <RadioButton
+                            android:id="@+id/radioSensityLow"
+                            android:layout_width="@dimen/adas_sensity_item_width"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/radio_left"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/adas_sensity_low"
+                            android:textSize="15sp" />
+
+                        <RadioButton
+                            android:id="@+id/radioSensityMiddle"
+                            android:layout_width="@dimen/adas_sensity_item_width"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/radio_middle"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/adas_sensity_middle"
+                            android:textSize="15sp" />
+
+                        <RadioButton
+                            android:id="@+id/radioSensityHigh"
+                            android:layout_width="@dimen/adas_sensity_item_width"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/radio_right"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/adas_sensity_high"
+                            android:textSize="15sp" />
+                    </RadioGroup>
+                </RelativeLayout>
+
+                <!-- 最低预警车速 -->
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginLeft="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
+
+                    <TextView
+                        android:id="@+id/textSpeed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_title_min_speed"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/textSpeed"
+                        android:text="@string/adas_speed_unit"
+                        android:textColor="@color/adas_setting_text_color_dark"
+                        android:textSize="18sp" />
+
+                    <RadioGroup
+                        android:id="@+id/groupSpeed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:orientation="horizontal" >
+
+                        <RadioButton
+                            android:id="@+id/radioSpeed0"
+                            android:layout_width="@dimen/adas_speed_item_width"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/radio_left"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/adas_speed_0"
+                            android:textSize="15sp" />
+
+                        <RadioButton
+                            android:id="@+id/radioSpeed20"
+                            android:layout_width="@dimen/adas_speed_item_width"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/radio_middle"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/adas_speed_20"
+                            android:textSize="15sp" />
+
+                        <RadioButton
+                            android:id="@+id/radioSpeed50"
+                            android:layout_width="@dimen/adas_speed_item_width"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/radio_middle"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/adas_speed_50"
+                            android:textSize="15sp" />
+
+                        <RadioButton
+                            android:id="@+id/radioSpeed80"
+                            android:layout_width="@dimen/adas_speed_item_width"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/radio_right"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:text="@string/adas_speed_80"
+                            android:textSize="15sp" />
+                    </RadioGroup>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
-                android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
-                android:background="@color/adas_separtor_line_color" />
+                android:layout_height="@dimen/adas_setting_item_height"
+                android:layout_marginBottom="@dimen/adas_setting_item_margin_vertical"
+                android:orientation="horizontal" >
 
-            <!-- 前车碰撞预警 -->
+                <!-- 车头校正线 -->
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/adas_setting_item_height" >
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginRight="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/adas_title_vehicle"
-                    android:textColor="@color/adas_setting_text_color"
-                    android:textSize="@dimen/adas_setting_text_size" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_angle_adjust"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
 
-                <Switch
-                    android:id="@+id/switchAdasVehicle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
+                    <Switch
+                        android:id="@+id/switchAngleAdjust"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
-                android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
-                android:background="@color/adas_separtor_line_color" />
-            <!-- 声音提示 -->
+                <!-- 室内调试 -->
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/adas_setting_item_height" >
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/adas_setting_item_height"
+                    android:layout_marginLeft="@dimen/adas_setting_item_margin_horizontal"
+                    android:layout_weight="1"
+                    android:background="@color/adas_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/adas_setting_item_padding" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/adas_title_sound"
-                    android:textColor="@color/adas_setting_text_color"
-                    android:textSize="@dimen/adas_setting_text_size" />
+                    <TextView
+                        android:id="@+id/textIndoorDebug"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/adas_indoor_debug"
+                        android:textColor="@color/adas_setting_text_color"
+                        android:textSize="@dimen/adas_setting_text_size" />
 
-                <Switch
-                    android:id="@+id/switchAdasSound"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/textIndoorDebug"
+                        android:text="@string/adas_indoor_debug_hint"
+                        android:textColor="@color/adas_setting_text_color_dark"
+                        android:textSize="18sp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
-                android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
-                android:background="@color/adas_separtor_line_color" />
-
-            <!-- 车头校正线 -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/adas_setting_item_height" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/adas_angle_adjust"
-                    android:textColor="@color/adas_setting_text_color"
-                    android:textSize="@dimen/adas_setting_text_size" />
-
-                <Switch
-                    android:id="@+id/switchAngleAdjust"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/adas_separtor_line_margin_top_bottom"
-                android:layout_marginTop="@dimen/adas_separtor_line_margin_top_bottom"
-                android:background="@color/adas_separtor_line_color" />
-
-            <!-- 室内调试 -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/adas_setting_item_height" >
-
-                <TextView
-                    android:id="@+id/textIndoorDebug"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/adas_indoor_debug"
-                    android:textColor="@color/adas_setting_text_color"
-                    android:textSize="@dimen/adas_setting_text_size" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5px"
-                    android:layout_toRightOf="@id/textIndoorDebug"
-                    android:text="@string/adas_indoor_debug_hint"
-                    android:textColor="@color/adas_separtor_line_color"
-                    android:textSize="18sp" />
-
-                <Switch
-                    android:id="@+id/switchAdasIndoor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
+                    <Switch
+                        android:id="@+id/switchAdasIndoor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

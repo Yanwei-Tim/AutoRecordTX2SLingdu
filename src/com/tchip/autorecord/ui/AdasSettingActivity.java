@@ -9,8 +9,13 @@ import com.tchip.autorecord.util.ProviderUtil.Name;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -39,11 +44,14 @@ public class AdasSettingActivity extends Activity {
 	 * 室内调试
 	 */
 	private Switch switchAdasIndoor;
-	
+
 	/**
 	 * 摄像头角度调整辅助线
 	 */
 	private Switch switchAngleAdjust;
+
+	private RadioButton radioSensityLow, radioSensityMiddle, radioSensityHigh;
+	private RadioButton radioSpeed0, radioSpeed20, radioSpeed50, radioSpeed80;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -110,8 +118,7 @@ public class AdasSettingActivity extends Activity {
 				});
 
 		switchAdasSound = (Switch) findViewById(R.id.switchAdasSound);
-		switchAdasSound.setChecked("1".equals(ProviderUtil.getValue(context,
-				Name.ADAS_SOUND, "1")));
+		switchAdasSound.setChecked(isAdasSoundEnable(context));
 		switchAdasSound
 				.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -137,19 +144,128 @@ public class AdasSettingActivity extends Activity {
 					}
 				});
 
-		
 		switchAngleAdjust = (Switch) findViewById(R.id.switchAngleAdjust);
 		switchAngleAdjust.setChecked("1".equals(ProviderUtil.getValue(context,
 				Name.ADAS_ANGLE_ADJUST, "0")));
-		switchAngleAdjust.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				ProviderUtil.setValue(context, Name.ADAS_ANGLE_ADJUST,
-						isChecked ? "1" : "0");
+		switchAngleAdjust
+				.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView,
+							boolean isChecked) {
+						ProviderUtil.setValue(context, Name.ADAS_ANGLE_ADJUST,
+								isChecked ? "1" : "0");
+					}
+				});
+
+		RadioGroup groupSensity = (RadioGroup) findViewById(R.id.groupSensity);
+		radioSensityLow = (RadioButton) findViewById(R.id.radioSensityLow);
+		radioSensityMiddle = (RadioButton) findViewById(R.id.radioSensityMiddle);
+		radioSensityHigh = (RadioButton) findViewById(R.id.radioSensityHigh);
+
+		String adasSensity = ProviderUtil.getValue(context, Name.ADAS_SENSITY,
+				"1");
+
+		if ("0".equals(adasSensity)) { // 低
+			radioSensityLow.setChecked(true);
+		} else if ("2".equals(adasSensity)) { // 高
+			radioSensityHigh.setChecked(true);
+		} else { // 中
+			radioSensityMiddle.setChecked(true);
+		}
+
+		groupSensity
+				.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+					@Override
+					public void onCheckedChanged(RadioGroup group, int checkedId) {
+						switch (checkedId) {
+						case R.id.radioSensityLow:
+							ProviderUtil.setValue(context, Name.ADAS_SENSITY,
+									"0");
+							break;
+
+						case R.id.radioSensityHigh:
+							ProviderUtil.setValue(context, Name.ADAS_SENSITY,
+									"2");
+							break;
+
+						case R.id.radioSensityMiddle:
+						default:
+							ProviderUtil.setValue(context, Name.ADAS_SENSITY,
+									"1");
+							break;
+						}
+
+					}
+				});
+
+		RadioGroup groupSpeed = (RadioGroup) findViewById(R.id.groupSpeed);
+		radioSpeed0 = (RadioButton) findViewById(R.id.radioSpeed0);
+		radioSpeed20 = (RadioButton) findViewById(R.id.radioSpeed20);
+		radioSpeed50 = (RadioButton) findViewById(R.id.radioSpeed50);
+		radioSpeed80 = (RadioButton) findViewById(R.id.radioSpeed80);
+
+		String adasThreshold = ProviderUtil.getValue(context,
+				Name.ADAS_THRESHOLD, "20");
+		if ("0".equals(adasThreshold)) {
+			radioSpeed0.setChecked(true);
+		} else if ("50".equals(adasThreshold)) {
+			radioSpeed50.setChecked(true);
+		} else if ("80".equals(adasThreshold)) {
+			radioSpeed80.setChecked(true);
+		} else {
+			radioSpeed20.setChecked(true);
+		}
+		groupSpeed
+				.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+					@Override
+					public void onCheckedChanged(RadioGroup group, int checkedId) {
+						switch (checkedId) {
+						case R.id.radioSpeed0:
+							ProviderUtil.setValue(context, Name.ADAS_THRESHOLD,
+									"0");
+							break;
+
+						case R.id.radioSpeed50:
+							ProviderUtil.setValue(context, Name.ADAS_THRESHOLD,
+									"50");
+							break;
+
+						case R.id.radioSpeed80:
+							ProviderUtil.setValue(context, Name.ADAS_THRESHOLD,
+									"80");
+							break;
+
+						case 20:
+						default:
+							ProviderUtil.setValue(context, Name.ADAS_THRESHOLD,
+									"20");
+							break;
+						}
+					}
+				});
+
+	}
+
+	private boolean isAdasSoundEnable(Context context) {
+		return "1".equals(ProviderUtil.getValue(context, Name.ADAS_SOUND, "1"));
+	}
+
+	private MyOnClickListener myOnClickListener;
+
+	class MyOnClickListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			switch (v.getId()) {
+
+			default:
+				break;
 			}
-		});
-		
+
+		}
 	}
 
 	private void checkAdasLicensed(Context context) {

@@ -72,6 +72,16 @@
     <string name="adas_title_auth_state">ADAS授权状态 </string>
     <string name="adas_title_line">车道偏离预警</string>
     <string name="adas_title_vehicle">前车碰撞预警</string>
+    <string name="adas_title_sensity">预警灵敏度</string>
+    <string name="adas_sensity_low">低</string>
+    <string name="adas_sensity_middle">中</string>
+    <string name="adas_sensity_high">高</string>
+    <string name="adas_title_min_speed">预警门限</string>
+    <string name="adas_speed_0">不限</string>
+    <string name="adas_speed_20">20</string>
+    <string name="adas_speed_50">50</string>
+    <string name="adas_speed_80">80</string>
+    <string name="adas_speed_unit">（Km/h）</string>
     <string name="adas_title_sound">声音提示</string>
     <string name="adas_angle_adjust">摄像头角度调整辅助线</string>
     <string name="adas_indoor_debug">室内调试</string>
