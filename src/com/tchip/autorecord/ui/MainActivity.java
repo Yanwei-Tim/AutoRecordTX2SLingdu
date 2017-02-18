@@ -67,6 +67,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -189,22 +190,6 @@ public class MainActivity extends Activity {
 				uiConfig = UIConfig.SL9;
 			} else {
 				uiConfig = UIConfig.TQ9;
-			}
-		} else if ("TX3".equals(model)) { // TX3-7.84
-			CAMERA_WIDTH = 1184;
-			CAMERA_HEIGHT = 400;
-			if ("SL".equals(brand)) {
-				uiConfig = UIConfig.SL7;
-			} else {
-				uiConfig = UIConfig.TQ7;
-			}
-		} else { // TX2-6.86
-			CAMERA_WIDTH = 1184;
-			CAMERA_HEIGHT = 480;
-			if ("SL".equals(brand)) {
-				uiConfig = UIConfig.SL6;
-			} else {
-				uiConfig = UIConfig.TQ6;
 			}
 		}
 
@@ -745,7 +730,7 @@ public class MainActivity extends Activity {
 	}
 
 	private MainReceiver mainReceiver;
-	private int cameraBeforeBack = 0; // 倒车前界面：0-前 1-后
+	private int cameraBeforeBack = 0; // 倒车前界面：0-前 1-后 2-前后
 
 	public class MainReceiver extends BroadcastReceiver {
 
@@ -1218,8 +1203,9 @@ public class MainActivity extends Activity {
 	private void switchCameraTo(int camera) {
 		MyLog.v("switchCameraTo:" + camera);
 		switch (camera) {
-		case 0:
+		case 0: // FRONT
 			layoutFront.setVisibility(View.VISIBLE);
+			imageAdas.setVisibility(View.VISIBLE);
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(
 					CAMERA_WIDTH, CAMERA_HEIGHT));
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(1,
@@ -1228,7 +1214,7 @@ public class MainActivity extends Activity {
 			setBackLineVisible(false);
 			break;
 
-		case 1:
+		case 1: // BACK
 			layoutBack.setVisibility(View.VISIBLE);
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
 					CAMERA_WIDTH, CAMERA_HEIGHT)); // 854,480
@@ -1243,6 +1229,20 @@ public class MainActivity extends Activity {
 			} else {
 				setBackLineVisible(false);
 			}
+			break;
+
+		case 2: { // FRONT + BACK
+			layoutFront.setVisibility(View.VISIBLE);
+			imageAdas.setVisibility(View.GONE);
+			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT));
+			RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT);
+			backLayoutParams.leftMargin = CAMERA_WIDTH / 2;
+			surfaceViewBack.setLayoutParams(backLayoutParams);
+			layoutBack.setVisibility(View.GONE);
+			setBackLineVisible(false);
+		}
 			break;
 
 		default:
@@ -1274,6 +1274,20 @@ public class MainActivity extends Activity {
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 			layoutFront.setVisibility(View.GONE);
+			break;
+
+		case 2: { // FRONT + BACK
+			layoutFront.setVisibility(View.VISIBLE);
+			imageAdas.setVisibility(View.GONE);
+			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT));
+			RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT);
+			backLayoutParams.leftMargin = CAMERA_WIDTH / 2;
+			surfaceViewBack.setLayoutParams(backLayoutParams);
+			layoutBack.setVisibility(View.GONE);
+			setBackLineVisible(false);
+		}
 			break;
 
 		default:
@@ -1576,8 +1590,13 @@ public class MainActivity extends Activity {
 					HintUtil.showToast(context,
 							getString(R.string.no_cvbs_detect));
 				} else {
-					switchCameraTo(1);
-					cameraBeforeBack = 1;
+					if (cameraBeforeBack == 0) {
+						switchCameraTo(2); // TODO:FIXME
+						cameraBeforeBack = 2;
+					} else {
+						switchCameraTo(1);
+						cameraBeforeBack = 1;
+					}
 				}
 				break;
 
