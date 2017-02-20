@@ -98,20 +98,6 @@ public class FileUtil {
 		return isFrontLockLess;
 	}
 
-	/** 本机内部存储可用空间低于设定阈值 */
-	public static boolean isFlashStorageLess() {
-		if (Constant.Record.flashToCard) {
-			float flashFree = StorageUtil
-					.getSDAvailableSize(Constant.Path.SDCARD_0);
-			long intFlashFree = (int) flashFree;
-			boolean isFlashStorageLess = intFlashFree < Constant.Record.FLASH_MIN_FREE_STORAGE;
-			MyLog.v("FileUtil.isFlashStorageLess:" + isFlashStorageLess);
-			return isFlashStorageLess;
-		} else {
-			return false;
-		}
-	}
-
 	public static void showFlashCleanDialog(final Context context) {
 		FlashCleanDialog.Builder builder = new FlashCleanDialog.Builder(
 				context.getApplicationContext());

@@ -90,10 +90,6 @@ public class StorageUtil {
 	/** 创建前后录像存储卡目录 */
 	public static void createRecordDirectory() {
 		try {
-			if (Constant.Record.flashToCard) {
-				new File(Constant.Path.VIDEO_FRONT_FLASH).mkdirs();
-				new File(Constant.Path.VIDEO_BACK_FLASH).mkdirs();
-			}
 			new File(Constant.Path.VIDEO_FRONT_SD).mkdirs();
 			new File(Constant.Path.VIDEO_BACK_SD).mkdirs();
 		} catch (Exception e) {
@@ -132,21 +128,19 @@ public class StorageUtil {
 
 	/** 将加锁视频移动到加锁文件夹 */
 	public static void lockVideo(boolean isFront, String videoName) {
-		if (!Constant.Record.flashToCard) {
-			String rawPath = isFront ? Constant.Path.VIDEO_FRONT_SD
-					: Constant.Path.VIDEO_BACK_SD;
-			String lockPath = isFront ? Constant.Path.VIDEO_FRONT_SD_LOCK
-					: Constant.Path.VIDEO_BACK_SD_LOCK;
-			File rawFile = new File(rawPath + videoName);
-			if (rawFile.exists() && rawFile.isFile()) {
-				File lockDir = new File(lockPath);
-				if (!lockDir.exists()) {
-					lockDir.mkdirs();
-				}
-				File lockFile = new File(lockDir + File.separator + videoName);
-				rawFile.renameTo(lockFile);
-				MyLog.v("StorageUtil.lockVideo:" + videoName);
+		String rawPath = isFront ? Constant.Path.VIDEO_FRONT_SD
+				: Constant.Path.VIDEO_BACK_SD;
+		String lockPath = isFront ? Constant.Path.VIDEO_FRONT_SD_LOCK
+				: Constant.Path.VIDEO_BACK_SD_LOCK;
+		File rawFile = new File(rawPath + videoName);
+		if (rawFile.exists() && rawFile.isFile()) {
+			File lockDir = new File(lockPath);
+			if (!lockDir.exists()) {
+				lockDir.mkdirs();
 			}
+			File lockFile = new File(lockDir + File.separator + videoName);
+			rawFile.renameTo(lockFile);
+			MyLog.v("StorageUtil.lockVideo:" + videoName);
 		}
 	}
 
