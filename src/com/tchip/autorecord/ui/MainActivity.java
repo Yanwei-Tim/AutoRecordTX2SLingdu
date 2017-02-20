@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
 
 	// 前置
 	private RelativeLayout layoutFront;
-	private TextView textFrontTime,textBackTime; // 时间跑秒
+	private TextView textFrontTime, textBackTime; // 时间跑秒
 	private ImageButton imageFrontState; // 录像按钮
 	private ImageButton imageFrontLock; // 加锁按钮
 	private TextView textFrontLock;
@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
 	private SurfaceView surfaceViewFront;
 	private SurfaceHolder surfaceHolderFront;
 	private TachographRecorder recorderFront;
-	private int intervalState, muteState;
+	private int intervalState = 1, muteState;
 
 	// 后置
 	private RelativeLayout layoutBack;
@@ -743,11 +743,19 @@ public class MainActivity extends Activity {
 				MyApp.isAccOn = true;
 				MyApp.shouldWakeRecord = true;
 
+				// 重设视频分段
 				String videoTimeStr = sharedPreferences.getString("videoTime",
 						"1");
-				intervalState = "3".equals(videoTimeStr) ? Constant.Record.STATE_INTERVAL_3MIN
-						: Constant.Record.STATE_INTERVAL_1MIN;
-				setRecordInterval(("3".equals(videoTimeStr)) ? 3 * 60 : 1 * 60); // 重设视频分段
+				if ("5".equals(videoTimeStr)) { // 5
+					intervalState = 5;
+					setRecordInterval(300);
+				} else if ("3".equals(videoTimeStr)) { // 3
+					intervalState = 3;
+					setRecordInterval(180);
+				} else { // 1
+					intervalState = 1;
+					setRecordInterval(60);
+				}
 
 				// 碰撞侦测服务
 				Intent intentSensor = new Intent(context,
@@ -857,10 +865,19 @@ public class MainActivity extends Activity {
 				if (MyApp.isParkRecording) {
 					setRecordInterval(3 * 60); // 防止在分段一分钟的时候，停车守卫录出1分和0秒两段视频
 				} else {
-					if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) {
-						setRecordInterval(3 * 60);
-					} else {
-						setRecordInterval(1 * 60);
+					switch (intervalState) {
+					case 5:
+						setRecordInterval(300);
+						break;
+
+					case 3:
+						setRecordInterval(180);
+						break;
+
+					case 1:
+					default:
+						setRecordInterval(60);
+						break;
 					}
 				}
 				// 自动录像:如果已经在录像则不处理
@@ -1542,16 +1559,23 @@ public class MainActivity extends Activity {
 			case R.id.imageVideoLength:
 			case R.id.textVideoLength:
 				if (!ClickUtil.isQuickClick(500)) {
-					if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) {
-						if (setRecordInterval(1 * 60) == 0) {
-							intervalState = Constant.Record.STATE_INTERVAL_1MIN;
+					if (intervalState == 5) {
+						if (setRecordInterval(60) == 0) { // 5 -> 1
+							intervalState = 1;
 							editor.putString("videoTime", "1");
 							speakVoice(getResources().getString(
 									R.string.hint_video_time_1));
 						}
-					} else if (intervalState == Constant.Record.STATE_INTERVAL_1MIN) {
-						if (setRecordInterval(3 * 60) == 0) {
-							intervalState = Constant.Record.STATE_INTERVAL_3MIN;
+					} else if (intervalState == 3) { // 3 -> 5
+						if (setRecordInterval(300) == 0) {
+							intervalState = 5;
+							editor.putString("videoTime", "5");
+							speakVoice(getResources().getString(
+									R.string.hint_video_time_5));
+						}
+					} else if (intervalState == 1) { // 1 -> 3
+						if (setRecordInterval(180) == 0) {
+							intervalState = 3;
 							editor.putString("videoTime", "3");
 							speakVoice(getResources().getString(
 									R.string.hint_video_time_3));
@@ -2019,16 +2043,21 @@ public class MainActivity extends Activity {
 				MyApp.isFrontRecording ? R.drawable.video_stop
 						: R.drawable.video_start, null));
 		// 视频分段
-		if (intervalState == Constant.Record.STATE_INTERVAL_1MIN) {
+		if (intervalState == 5) { // 5
 			imageVideoLength.setImageDrawable(getResources().getDrawable(
-					R.drawable.video_length_1m, null));
+					R.drawable.video_length_5m, null));
 			textVideoLength.setText(getResources().getString(
-					R.string.icon_hint_1_minute));
-		} else if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) {
+					R.string.icon_hint_5_minutes));
+		} else if (intervalState == 3) { // 3
 			imageVideoLength.setImageDrawable(getResources().getDrawable(
 					R.drawable.video_length_3m, null));
 			textVideoLength.setText(getResources().getString(
 					R.string.icon_hint_3_minutes));
+		} else { // 1
+			imageVideoLength.setImageDrawable(getResources().getDrawable(
+					R.drawable.video_length_1m, null));
+			textVideoLength.setText(getResources().getString(
+					R.string.icon_hint_1_minute));
 		}
 		// 视频加锁
 		imageFrontLock.setImageDrawable(getResources().getDrawable(
@@ -2434,8 +2463,14 @@ public class MainActivity extends Activity {
 								&& secondFrontCount == Constant.Record.parkVideoLength) {
 							String videoTimeStr = sharedPreferences.getString(
 									"videoTime", "1");
-							intervalState = "3".equals(videoTimeStr) ? Constant.Record.STATE_INTERVAL_3MIN
-									: Constant.Record.STATE_INTERVAL_1MIN;
+
+							if ("5".equals(videoTimeStr)) { // 5
+								intervalState = 5;
+							} else if ("3".equals(videoTimeStr)) { // 3
+								intervalState = 3;
+							} else { // 1
+								intervalState = 1;
+							}
 
 							MyLog.v("Front.updateFrontTimeHandler.Stop Park Record");
 							stopFrontRecorder5Times(); // 停止录像
@@ -2451,26 +2486,31 @@ public class MainActivity extends Activity {
 					}
 				}
 				switch (intervalState) { // 重置时间
-				case Constant.Record.STATE_INTERVAL_3MIN:
+
+				case 5:
+					if (secondFrontCount >= 300) {
+						secondFrontCount = 0;
+					}
+					break;
+
+				case 3:
 					if (secondFrontCount >= 180) {
 						secondFrontCount = 0;
 					}
 					break;
 
-				case Constant.Record.STATE_INTERVAL_1MIN:
+				case 1:
+				default:
 					if (secondFrontCount >= 60) {
 						secondFrontCount = 0;
 					}
-					break;
-
-				default:
 					break;
 				}
 				textFrontTime.setText(DateUtil
 						.getFormatTimeBySecond(secondFrontCount));
 				textBackTime.setText(DateUtil
 						.getFormatTimeBySecond(secondFrontCount));
-				
+
 				this.removeMessages(1);
 				break;
 
@@ -2492,13 +2532,18 @@ public class MainActivity extends Activity {
 				setupBackViews();
 
 				// 碰撞后判断是否需要加锁第二段视频
-				if (intervalState == Constant.Record.STATE_INTERVAL_1MIN) {
-					if (secondFrontCount > 45) {
+				if (intervalState == 5) {
+					if (secondFrontCount > 285) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
-				} else if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) {
+				} else if (intervalState == 3) { // 3
 					if (secondFrontCount > 165) {
+						MyApp.isFrontLockSecond = true;
+						MyApp.isBackLockSecond = true;
+					}
+				} else { // 1
+					if (secondFrontCount > 45) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
@@ -2809,8 +2854,14 @@ public class MainActivity extends Activity {
 				: Constant.Record.STATE_RESOLUTION_720P;
 
 		String videoTimeStr = sharedPreferences.getString("videoTime", "1"); // 视频分段
-		intervalState = "3".equals(videoTimeStr) ? Constant.Record.STATE_INTERVAL_3MIN
-				: Constant.Record.STATE_INTERVAL_1MIN;
+
+		if ("5".equals(videoTimeStr)) { // 5
+			intervalState = 5;
+		} else if ("3".equals(videoTimeStr)) { // 3
+			intervalState = 3;
+		} else { // 1
+			intervalState = 1;
+		}
 	}
 
 	/** 设置分辨率 */
@@ -2910,10 +2961,12 @@ public class MainActivity extends Activity {
 			recorderFront.setVideoFrameRate(Constant.Record.FRONT_FRAME_720P);
 			recorderFront.setVideoBiteRate(Constant.Record.FRONT_BITRATE_720P);
 		}
-		if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) { // 分段
-			recorderFront.setVideoSeconds(3 * 60);
+		if (intervalState == 5) { // 分段
+			recorderFront.setVideoSeconds(300);
+		} else if (intervalState == 3) {
+			recorderFront.setVideoSeconds(180);
 		} else {
-			recorderFront.setVideoSeconds(1 * 60);
+			recorderFront.setVideoSeconds(60);
 		}
 		recorderFront.setVideoOverlap(0); // 重叠
 		if (null != sharedPreferences) { // 录音
@@ -3149,10 +3202,12 @@ public class MainActivity extends Activity {
 			recorderBack.setVideoSize(640, 480); // (640, 480)(1280,720)
 			recorderBack.setVideoFrameRate(Constant.Record.BACK_FRAME);
 			recorderBack.setVideoBiteRate(Constant.Record.BACK_BITRATE);
-			if (intervalState == Constant.Record.STATE_INTERVAL_3MIN) {
-				recorderBack.setVideoSeconds(3 * 60);
+			if (intervalState == 5) {
+				recorderBack.setVideoSeconds(300);
+			} else if (intervalState == 3) {
+				recorderBack.setVideoSeconds(180);
 			} else {
-				recorderBack.setVideoSeconds(1 * 60);
+				recorderBack.setVideoSeconds(60);
 			}
 			recorderBack.setVideoOverlap(0);
 			recorderBack.prepare();

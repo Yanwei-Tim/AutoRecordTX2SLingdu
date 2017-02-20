@@ -11,6 +11,7 @@
     <string name="hint_video_unlock_back">后录解锁</string>
     <string name="hint_video_size_720">分辨率七二零P</string>
     <string name="hint_video_size_1080">分辨率一零八零P</string>
+    <string name="hint_video_time_5">视频分段五分钟</string>
     <string name="hint_video_time_3">视频分段三分钟</string>
     <string name="hint_video_time_1">视频分段一分钟</string>
     <string name="hint_video_mute_off">录音</string>
@@ -40,6 +41,7 @@
     <string name="app_has_exception">很抱歉录像异常，即将退出</string>
 
     <!-- Icon + Text -->
+    <string name="icon_hint_5_minutes">5分钟</string>
     <string name="icon_hint_3_minutes">3分钟</string>
     <string name="icon_hint_1_minute">1分钟</string>
     <string name="icon_hint_1080p">1080P</string>

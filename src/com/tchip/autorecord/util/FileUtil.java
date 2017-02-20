@@ -45,11 +45,11 @@ public class FileUtil {
 	private static float getVideoRate(int resolution, boolean isFront) {
 		switch (resolution) {
 		case Constant.Record.STATE_RESOLUTION_1080P:
-			return isFront ? 194.0f / 219 : 25.0f / 219;
+			return isFront ? 0.884f : 0.116f; // 194.0f / 219 : 25.0f / 219;
 
 		case Constant.Record.STATE_RESOLUTION_720P:
 		default:
-			return isFront ? 137.0f / 162 : 25.0f / 162;
+			return isFront ? 0.845f : 0.155f; // 137.0f / 162 : 25.0f / 162;
 		}
 	}
 

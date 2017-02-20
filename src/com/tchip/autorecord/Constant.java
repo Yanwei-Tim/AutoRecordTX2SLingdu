@@ -205,21 +205,21 @@ public interface Constant {
 		public static final int autoRecordDelay = 3500;
 
 		public static final int K = 1024;
-		public static final int M = 1024 * 1024;
+		public static final int M = 1048576; // 1024 * 1024
 
 		/** 循环录像保留空间(单位：字节B) */
-		public static final long FRONT_MIN_FREE_STORAGE = 900 * M; // 900M
-		public static final long BACK_MIN_FREE_STORAGE = 150 * M; // 150M
-		public static final long FLASH_MIN_FREE_STORAGE = 200 * M;
+		public static final long FRONT_MIN_FREE_STORAGE = 943718400; // 900M
+		public static final long BACK_MIN_FREE_STORAGE = 157286400; // 150M
+		public static final long FLASH_MIN_FREE_STORAGE = 209715200; // 200M
 		public static final float FRONT_LOCK_MAX_PERCENT = 0.4f; // 40%
 		public static final float BACK_LOCK_MAX_PERCENT = 0.1f; // 10%
 
 		/** 比特率 */
 		// 720P: MTK:9M X1:3.5M 1280x720=921600
-		public static final int FRONT_BITRATE_720P = 7200 * K; // 5 * M
+		public static final int FRONT_BITRATE_720P = 7372800; // 7200 * K
 		// 1080P: MTK:17M X1:8M RAW:10M 1920x1080=2073600
-		public static final int FRONT_BITRATE_1080P = 9600 * K; // (int)7.6 * M;
-		public static final int BACK_BITRATE = 1 * M; // 600 * K; // 0.6M,2M
+		public static final int FRONT_BITRATE_1080P = 9830400; // 9600 * K
+		public static final int BACK_BITRATE = 1048576; // 1 * M
 
 		/** 帧率 */
 		public static final int FRONT_FRAME_720P = 24;
@@ -233,10 +233,6 @@ public interface Constant {
 		// 录像状态
 		public static final int STATE_RECORD_STARTED = 0;
 		public static final int STATE_RECORD_STOPPED = 1;
-
-		// 视频分段
-		public static final int STATE_INTERVAL_3MIN = 0;
-		public static final int STATE_INTERVAL_1MIN = 2;
 
 		// 第二视图
 		public static final int STATE_SECONDARY_ENABLE = 0;
