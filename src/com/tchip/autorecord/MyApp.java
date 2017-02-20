@@ -107,6 +107,8 @@ public class MyApp extends Application {
 
 	/** 是否正在显示内部存储空间过低对话框 */
 	public static boolean isFlashCleanDialogShow = false;
+	
+	public static boolean needDeleteLockHint = false;
 
 	private Context context;
 

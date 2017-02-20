@@ -12,7 +12,9 @@ import com.tchip.autorecord.R;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Looper;
 import android.os.StatFs;
+import android.widget.Toast;
 
 public class StorageUtil {
 
@@ -162,7 +164,7 @@ public class StorageUtil {
 					if (childFile.getName().startsWith(videoPrefix)
 							&& childFile.exists()) {
 						childFile.delete();
-						MyLog.w("[deleteBackByFront]Delte Back:"
+						MyLog.w("[deleteBackByFront]Delete Back:"
 								+ childFile.getPath());
 						for (File childFileOld : childFiles) { // 比删除视频的日期旧的视频也删除
 							// 2016-08-22_203957_1.mp4
@@ -177,7 +179,7 @@ public class StorageUtil {
 										.substring(0, 4));
 								if (childYear < thisYear) {
 									if (childFileOld.exists()) {
-										MyLog.w("[deleteBackByFront]Delte Back OLD:"
+										MyLog.w("[deleteBackByFront]Delete Back OLD:"
 												+ childFileOld.getPath());
 										childFileOld.delete();
 									}
@@ -190,7 +192,7 @@ public class StorageUtil {
 													5, 7));
 									if (childMonth < thisMonth) {
 										if (childFileOld.exists()) {
-											MyLog.w("[deleteBackByFront]Delte Back OLD:"
+											MyLog.w("[deleteBackByFront]Delete Back OLD:"
 													+ childFileOld.getPath());
 											childFileOld.delete();
 										}
@@ -204,7 +206,7 @@ public class StorageUtil {
 
 										if (childDay < thisDay) {
 											if (childFileOld.exists()) {
-												MyLog.w("[deleteBackByFront]Delte Back OLD:"
+												MyLog.w("[deleteBackByFront]Delete Back OLD:"
 														+ childFileOld
 																.getPath());
 												childFileOld.delete();
@@ -218,7 +220,7 @@ public class StorageUtil {
 															.substring(11, 13));
 											if (childHour < thisHour) {
 												if (childFileOld.exists()) {
-													MyLog.w("[deleteBackByFront]Delte Back OLD:"
+													MyLog.w("[deleteBackByFront]Delete Back OLD:"
 															+ childFileOld
 																	.getPath());
 													childFileOld.delete();
@@ -234,7 +236,7 @@ public class StorageUtil {
 																		15));
 												if (childMinute < thisMinute) {
 													if (childFileOld.exists()) {
-														MyLog.w("[deleteBackByFront]Delte Back OLD:"
+														MyLog.w("[deleteBackByFront]Delete Back OLD:"
 																+ childFileOld
 																		.getPath());
 														childFileOld.delete();
@@ -272,7 +274,7 @@ public class StorageUtil {
 					if (childFile.getName().startsWith(videoPrefix)
 							&& childFile.exists()) {
 						childFile.delete();
-						MyLog.w("[deleteFrontByBack]Delte Front:"
+						MyLog.w("[deleteFrontByBack]Delete Front:"
 								+ childFile.getPath());
 						for (File childFileOld : childFiles) { // 比删除视频的日期旧的视频也删除
 							// 2016-08-22_203957_0.mp4
@@ -287,7 +289,7 @@ public class StorageUtil {
 										.substring(0, 4));
 								if (childYear < thisYear) {
 									if (childFileOld.exists()) {
-										MyLog.w("[deleteFrontByBack]Delte Front OLD:"
+										MyLog.w("[deleteFrontByBack]Delete Front OLD:"
 												+ childFileOld.getPath());
 										childFileOld.delete();
 									}
@@ -300,7 +302,7 @@ public class StorageUtil {
 													5, 7));
 									if (childMonth < thisMonth) {
 										if (childFileOld.exists()) {
-											MyLog.w("[deleteFrontByBack]Delte Front OLD:"
+											MyLog.w("[deleteFrontByBack]Delete Front OLD:"
 													+ childFileOld.getPath());
 											childFileOld.delete();
 										}
@@ -314,7 +316,7 @@ public class StorageUtil {
 
 										if (childDay < thisDay) {
 											if (childFileOld.exists()) {
-												MyLog.w("[deleteFrontByBack]Delte Front OLD:"
+												MyLog.w("[deleteFrontByBack]Delete Front OLD:"
 														+ childFileOld
 																.getPath());
 												childFileOld.delete();
@@ -328,7 +330,7 @@ public class StorageUtil {
 															.substring(11, 13));
 											if (childHour < thisHour) {
 												if (childFileOld.exists()) {
-													MyLog.w("[deleteFrontByBack]Delte Front OLD:"
+													MyLog.w("[deleteFrontByBack]Delete Front OLD:"
 															+ childFileOld
 																	.getPath());
 													childFileOld.delete();
@@ -344,7 +346,7 @@ public class StorageUtil {
 																		15));
 												if (childMinute < thisMinute) {
 													if (childFileOld.exists()) {
-														MyLog.w("[deleteFrontByBack]Delte Front OLD:"
+														MyLog.w("[deleteFrontByBack]Delete Front OLD:"
 																+ childFileOld
 																		.getPath());
 														childFileOld.delete();
@@ -459,6 +461,8 @@ public class StorageUtil {
 							boolean isSuccess = fileOldest.delete();
 							MyLog.i("releaseFrontStorage.DEL Lock:" + fileName
 									+ " " + isSuccess);
+
+							MyApp.needDeleteLockHint = true;
 						}
 					} else {
 						if (FileUtil.isFrontStorageLess()) { // 此时若空间依然不足,提示用户清理存储（已不是行车视频的原因）
@@ -534,6 +538,8 @@ public class StorageUtil {
 							boolean isSuccess = fileOldest.delete();
 							MyLog.i("releaseBackStorage.DEL Lock:" + fileName
 									+ " " + isSuccess);
+
+							MyApp.needDeleteLockHint = true;
 						}
 					} else {
 						if (FileUtil.isBackStorageLess()) { // 此时若空间依然不足,提示用户清理存储（已不是行车视频的原因）

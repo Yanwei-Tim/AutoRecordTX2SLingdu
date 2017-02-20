@@ -943,6 +943,13 @@ public class MainActivity extends Activity {
 						&& !MyApp.isBackRecording && !isFroceSleeping) {
 					new Thread(new ForceSleepThread()).start();
 				}
+
+				if (MyApp.needDeleteLockHint) {
+					MyApp.needDeleteLockHint = false;
+					Message messageDeleteLock = new Message();
+					messageDeleteLock.what = 2;
+					backgroundHandler.sendMessage(messageDeleteLock);
+				}
 			}
 		}
 	}
@@ -1012,6 +1019,16 @@ public class MainActivity extends Activity {
 						new Thread(new RecordBackWhenMountThread()).start();
 					}
 				}
+				break;
+
+			case 2:
+				this.removeMessages(2);
+				HintUtil.showToast(
+						context,
+						getResources().getString(
+								R.string.hint_storage_full_and_delete_lock));
+				MyApp.needDeleteLockHint = false;
+				this.removeMessages(2);
 				break;
 
 			default:
@@ -1785,10 +1802,6 @@ public class MainActivity extends Activity {
 					public void run() {
 						resetBackTimeText();
 						if (isDeleteBackSuccess) {
-							HintUtil.playAudio(
-									getApplicationContext(),
-									com.tchip.tachograph.TachographCallback.FILE_TYPE_VIDEO,
-									MyApp.isAccOn);
 							if (MyApp.isBackPreview
 									&& recorderBack.start() == 0) {
 								setBackState(true);
@@ -3061,10 +3074,6 @@ public class MainActivity extends Activity {
 		textBackTime.setVisibility(View.INVISIBLE);
 		if (recorderBack != null) {
 			MyLog.d("Back.StopRecorder");
-			// 停车守卫不播放声音
-			HintUtil.playAudio(getApplicationContext(),
-					com.tchip.tachograph.TachographCallback.FILE_TYPE_VIDEO,
-					MyApp.isAccOn);
 			return recorderBack.stop();
 		}
 		return -1;

@@ -5,9 +5,9 @@
     <string name="hello_world">Hello world!</string>
 
     <!-- Record -->
-    <string name="hint_video_lock_front">前录加锁</string>
+    <string name="hint_video_lock_front">视频加锁</string>
     <string name="hint_video_unlock_front">前录解锁</string>
-    <string name="hint_video_lock_back">后录加锁</string>
+    <string name="hint_video_lock_back">视频加锁</string>
     <string name="hint_video_unlock_back">后录解锁</string>
     <string name="hint_video_size_720">分辨率七二零P</string>
     <string name="hint_video_size_1080">分辨率一零八零P</string>

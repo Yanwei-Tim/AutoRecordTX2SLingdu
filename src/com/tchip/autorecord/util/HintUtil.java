@@ -31,8 +31,15 @@ public class HintUtil {
 		}
 	}
 
+	private static Toast toast = null;
+
 	public static void showToast(Context context, String content) {
-		Toast.makeText(context, content, Toast.LENGTH_SHORT).show();
+		if (toast == null) {
+			toast = Toast.makeText(context, content, Toast.LENGTH_SHORT);
+		} else {
+			toast.setText(content);
+		}
+		toast.show();
 	}
 
 	/**
