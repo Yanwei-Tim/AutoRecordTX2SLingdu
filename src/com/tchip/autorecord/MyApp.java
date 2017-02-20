@@ -62,7 +62,6 @@ public class MyApp extends Application {
 
 	/** 更新录像时间线程是否正在运行 */
 	public static boolean isUpdateFrontTimeRun = false;
-	public static boolean isUpdateBackTimeRun = false;
 
 	/** 当前视频片段是否加锁 */
 	public static boolean isFrontLock = false;
