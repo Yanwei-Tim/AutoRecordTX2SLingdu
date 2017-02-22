@@ -416,23 +416,31 @@ public class MainActivity extends Activity {
 	}
 
 	private void updateSpeedByLocation(Location location) {
-		int tempSpeed = (int) (location.getSpeed() * 3.6); // m/s --> Km/h
-		adasSpeed = tempSpeed;
-		recordSpeed = tempSpeed;
+		try {
+			if (location != null) {
+				int tempSpeed = (int) (location.getSpeed() * 3.6); // m/s -->
+																	// Km/h
+				adasSpeed = tempSpeed;
+				recordSpeed = tempSpeed;
 
-		nowLatitude = location.getLatitude();
-		nowLongitude = location.getLongitude();
+				nowLatitude = location.getLatitude();
+				nowLongitude = location.getLongitude();
 
-		MyLog.i("GPS", "Speed:" + tempSpeed);
-		if (recorderFront != null) {
-			if (recordSpeed > 0) {
-				recorderFront.setSpeed(recordSpeed);
-				recordSpeed = 0; // 清除速度
+				MyLog.i("GPS", "Speed:" + tempSpeed);
+				if (recorderFront != null) {
+					if (recordSpeed > 0) {
+						recorderFront.setSpeed(recordSpeed);
+						recordSpeed = 0; // 清除速度
+					}
+					recorderFront.setLat(new DecimalFormat("#.00000")
+							.format(nowLatitude) + "");
+					recorderFront.setLong(new DecimalFormat("#.00000")
+							.format(nowLongitude) + "");
+				}
 			}
-			recorderFront.setLat(new DecimalFormat("#.00000")
-					.format(nowLatitude) + "");
-			recorderFront.setLong(new DecimalFormat("#.00000")
-					.format(nowLongitude) + "");
+		} catch (Exception e) {
+			MyLog.e("GPS", "updateSpeedByLocation catch:" + e.toString());
+
 		}
 	}
 
@@ -833,10 +841,13 @@ public class MainActivity extends Activity {
 			} else if ("tchip.intent.action.MOVE_RECORD_BACK".equals(action)) {
 				moveTaskToBack(true);
 			} else if (Constant.Broadcast.GPS_STATUS.equals(action)) {
-				Bundle budle = intent.getExtras();
-				// nowSpeed = budle.getInt("speed");
-				// nowLatitude = budle.getDouble("mlat");
-				// nowLongitude = budle.getDouble("mLong");
+				try {
+					Bundle budle = intent.getExtras();
+					adasSpeed = budle.getInt("speed");
+					recordSpeed = budle.getInt("speed");
+				} catch (Exception e) {
+					MyLog.e("GPS", "GPS_STATUS.Catch " + e.toString());
+				}
 			}
 		}
 	}
@@ -3049,7 +3060,6 @@ public class MainActivity extends Activity {
 					}
 					adasInterface.Draw853480(adasBitmap, adasOutput);
 					imageAdas.setImageBitmap(adasBitmap);
-					// adasSpeed = 0; // 清除
 				}
 			}
 		});
