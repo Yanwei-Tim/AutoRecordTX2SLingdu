@@ -18,6 +18,7 @@ import com.tchip.autorecord.R;
 import com.tchip.autorecord.Typefaces;
 import com.tchip.autorecord.service.SensorWatchService;
 import com.tchip.autorecord.thread.WriteImageExifThread;
+import com.tchip.autorecord.util.AdasUtil;
 import com.tchip.autorecord.util.ClickUtil;
 import com.tchip.autorecord.util.DateUtil;
 import com.tchip.autorecord.util.HintUtil;
@@ -157,6 +158,8 @@ public class MainActivity extends Activity {
 
 	// ADAS
 	private ADASInterface adasInterface;
+	private boolean isAdasInitial = false;
+	private LicenseInterface licenseInterface;
 	private Bitmap adasBitmap;
 
 	private double[] adasOutput = new double[256];
@@ -212,23 +215,18 @@ public class MainActivity extends Activity {
 		if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			// TODO: Open GPS
 		} else {
-			String bestProvider = locationManager.getBestProvider(
-					getLocationCriteria(), true);
 			// 获取位置信息
 			// 如果不设置查询要求，getLastKnownLocation方法传人的参数为LocationManager.GPS_PROVIDER
 			Location location = locationManager
-					.getLastKnownLocation(bestProvider);
-			// 监听状态
-			locationManager.addGpsStatusListener(gpsStatusListener);
+					.getLastKnownLocation(locationManager.getBestProvider(
+							AdasUtil.getLocationCriteria(), true));
+			locationManager.addGpsStatusListener(gpsStatusListener); // 监听状态
 			// 绑定监听，有4个参数
 			// 参数1，设备：有GPS_PROVIDER和NETWORK_PROVIDER两种
 			// 参数2，位置信息更新周期，单位毫秒
 			// 参数3，位置变化最小距离：当位置距离变化超过此值时，将更新位置信息
 			// 参数4，监听
 			// 备注：参数2和3，如果参数3不为0，则以参数3为准；参数3为0，则通过时间来定时更新；两者为0，则随时刷新
-
-			// 1秒更新一次，或最小位移变化超过1米更新一次；
-			// 注意：此处更新准确度非常低，推荐在service里面启动一个Thread，在run中sleep(10000);然后执行handler.sendMessage(),更新位置
 			locationManager.requestLocationUpdates(
 					LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
 		}
@@ -298,6 +296,7 @@ public class MainActivity extends Activity {
 		intentFilter.addAction(Constant.Broadcast.RELEASE_RECORD);
 		intentFilter.addAction(Constant.Broadcast.RELEASE_RECORD_TEST);
 		intentFilter.addAction("tchip.intent.action.MOVE_RECORD_BACK");
+		intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 		intentFilter.addAction(Constant.Broadcast.GPS_STATUS);
 		registerReceiver(mainReceiver, intentFilter);
 
@@ -320,6 +319,12 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
+
+		licenseInterface = new LicenseInterface();
+
+		authAdas();
+		initialAdasInterface();
+
 	}
 
 	@Override
@@ -393,6 +398,7 @@ public class MainActivity extends Activity {
 
 		if (adasInterface != null) {
 			adasInterface.ReleaseInterface(); // 释放 ADAS，退出或创建新的对象前调用
+			isAdasInitial = false;
 		}
 
 		if (mainReceiver != null) {
@@ -413,6 +419,22 @@ public class MainActivity extends Activity {
 			return true;
 		} else
 			return super.onKeyDown(keyCode, event);
+	}
+
+	/**
+	 * 初始化AdasInterface，前提：
+	 * 
+	 * LicenseInterface.isLicensed == true
+	 */
+	private void initialAdasInterface() {
+		if (licenseInterface.isLicensed(context)) {
+			MyLog.i("ADAS", "initialAdasInterface");
+			adasInterface = new ADASInterface(480, 640, MainActivity.this);
+			isAdasInitial = true;
+			AdasUtil.setAdasConfig(context, adasInterface);
+		} else {
+			MyLog.i("ADAS", "isLicensed == false");
+		}
 	}
 
 	private void updateSpeedByLocation(Location location) {
@@ -490,23 +512,6 @@ public class MainActivity extends Activity {
 		}
 
 	};
-
-	/**
-	 * 返回查询条件
-	 * 
-	 * @return
-	 */
-	private Criteria getLocationCriteria() {
-		Criteria criteria = new Criteria();
-		// 设置定位精确度 Criteria.ACCURACY_COARSE比较粗略，Criteria.ACCURACY_FINE则比较精细
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		criteria.setSpeedRequired(true); // 设置是否要求速度
-		criteria.setCostAllowed(false); // 设置是否允许运营商收费
-		criteria.setBearingRequired(false); // 设置是否需要方位信息
-		criteria.setAltitudeRequired(false); // 设置是否需要海拔信息
-		criteria.setPowerRequirement(Criteria.POWER_LOW); // 设置对电源的需求
-		return criteria;
-	}
 
 	// 状态监听
 	GpsStatus.Listener gpsStatusListener = new GpsStatus.Listener() {
@@ -654,7 +659,9 @@ public class MainActivity extends Activity {
 
 			} else { // update
 				if (name.startsWith("adas")) { // ADAS
-					setAdasConfig();
+					if (licenseInterface.isLicensed(context)) {
+						AdasUtil.setAdasConfig(context, adasInterface);
+					}
 				} else if (Name.SET_DETECT_CRASH_STATE.equals(name)) {
 					String strDetectCrashState = ProviderUtil.getValue(context,
 							Name.SET_DETECT_CRASH_STATE, "1");
@@ -847,6 +854,10 @@ public class MainActivity extends Activity {
 					recordSpeed = budle.getInt("speed");
 				} catch (Exception e) {
 					MyLog.e("GPS", "GPS_STATUS.Catch " + e.toString());
+				}
+			} else if ("android.net.conn.CONNECTIVITY_CHANGE".equals(action)) {
+				if (!licenseInterface.isLicensed(context)) {
+					authAdas();
 				}
 			}
 		}
@@ -1510,12 +1521,6 @@ public class MainActivity extends Activity {
 
 				}
 				break;
-
-			// case R.id.imageBackState:
-			// if (!ClickUtil.isQuickClick(1000)) {
-			//
-			// }
-			// break;
 
 			case R.id.imageFrontLock:
 			case R.id.textFrontLock:
@@ -2988,78 +2993,34 @@ public class MainActivity extends Activity {
 		}
 		recorderFront.setAudioSampleRate(48000);
 
-		adasInterface = new ADASInterface(480, 640, MainActivity.this);
-		setAdasConfig();
-
 		recorderFront.setScaledStreamEnable(true, 640, 480);
 		recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
 
 			@Override
 			public void onScaledStream(byte[] data, int width, int height) {
-				// MyLog.i("[onScaledStream]");
 				if (MyApp.isAccOn) {
-					double speed = adasSpeed;
-					if ("1".equals(ProviderUtil.getValue(context,
-							Name.ADAS_INDOOR_DEBUG, "0"))) {
-						speed = 80.0;
-					}
-
-					adasBitmap.eraseColor(Color.TRANSPARENT);
-					if (adasInterface.process_yuv(data, speed, adasOutput,
-							ADASInterface.YUV_FORMAT_YV12) == 0) {
-						Canvas mCanvas = new Canvas(adasBitmap);
-						mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
-
-						authAdas();
-					} else {
-						// MyLog.i("ADAS", "Draw");
-						/**
-						 * output 存储格式说明： A.前十位：
-						 * 
-						 * @param [0] 车道1起点X坐标
-						 * @param [1] 车道1起点Y坐标
-						 * @param [2] 车道1终点X坐标
-						 * @param [3] 车道1终点Y坐标
-						 * @param [4] 车道1偏离标识（1为偏离）
-						 * 
-						 * @param [5] 车道2起点X坐标
-						 * @param [6] 车道2起点Y坐标
-						 * @param [7] 车道2终点X坐标
-						 * @param [8] 车道2终点Y坐标
-						 * @param [9] 车道2偏离标识（1为偏离）
-						 * 
-						 *        B.数组索引号 9 以后存储的为车尾数据， 每 5 位存储一个车尾相关数据， 存储顺序为：
-						 * 
-						 * @param 车尾区域左上角x坐标
-						 * @param 车尾区域左上角y坐标
-						 * @param 车尾区域宽度
-						 * @param 车尾距离
-						 * @param 碰撞预警标识
-						 *            (1代表需要预警)
-						 */
-						if (adasOutput.length >= 4 && adasOutput[4] == 1) {
-							MyLog.i("ADAS", "[4] == 1");
-							context.sendBroadcast(new Intent(
-									Constant.Broadcast.ADAS_MSG).putExtra(
-									"type", "right"));
+					if (isAdasInitial) {
+						double speed = adasSpeed;
+						if ("1".equals(ProviderUtil.getValue(context,
+								Name.ADAS_INDOOR_DEBUG, "0"))) {
+							speed = 80.0;
 						}
-
-						if (adasOutput.length >= 9 && adasOutput[9] == 1) {
-							MyLog.i("ADAS", "[9] == 1");
-							context.sendBroadcast(new Intent(
-									Constant.Broadcast.ADAS_MSG).putExtra(
-									"type", "left"));
+						adasBitmap.eraseColor(Color.TRANSPARENT);
+						if (adasInterface.process_yuv(data, speed, adasOutput,
+								ADASInterface.YUV_FORMAT_YV12) == 0) {
+							Canvas mCanvas = new Canvas(adasBitmap);
+							mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
+						} else {
+							AdasUtil.sendBroadcastByOutput(context, adasOutput);
 						}
-
-						if (adasOutput.length >= 14 && adasOutput[14] == 1) {
-							MyLog.i("ADAS", "[14] == 1");
-							context.sendBroadcast(new Intent(
-									Constant.Broadcast.ADAS_MSG).putExtra(
-									"type", "front"));
+						adasInterface.Draw853480(adasBitmap, adasOutput);
+						imageAdas.setImageBitmap(adasBitmap);
+					} else { // AdasInterface未初始化
+						MyLog.i("ADAS", "isAdasInitial == false");
+						if (licenseInterface.isLicensed(context)) {
+							initialAdasInterface();
 						}
 					}
-					adasInterface.Draw853480(adasBitmap, adasOutput);
-					imageAdas.setImageBitmap(adasBitmap);
 				}
 			}
 		});
@@ -3070,64 +3031,8 @@ public class MainActivity extends Activity {
 		// }
 	}
 
-	/**
-	 * 设置ADAS参数
-	 */
-	private void setAdasConfig() {
-		adasInterface.setDebug(1); // 绘制校准箭头
-		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_SOUND, "1"))) {
-			adasInterface.enableSound(ADASInterface.SET_ON); // 开启声音提示
-		} else {
-			adasInterface.enableSound(ADASInterface.SET_OFF);
-		}
-		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_LINE, "1"))) {
-			adasInterface.setLane(ADASInterface.SET_ON); // 车道偏离预警
-		} else {
-			adasInterface.setLane(ADASInterface.SET_OFF);
-		}
-		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_VEHICLE, "1"))) {
-			adasInterface.setVehicle(ADASInterface.SET_ON); // 前车碰撞预警
-		} else {
-			adasInterface.setVehicle(ADASInterface.SET_OFF);
-		}
-		if ("1".equals(ProviderUtil.getValue(context, Name.ADAS_ANGLE_ADJUST,
-				"0"))) {
-			adasInterface.CalibInfoSwitch(true); // 是否显示“调整摄像头角度,车身请勿超过红线”
-		} else {
-			adasInterface.CalibInfoSwitch(false);
-		}
-
-		String adasSensity = ProviderUtil.getValue(context, Name.ADAS_SENSITY,
-				"1"); // 设置预警灵敏度
-		if ("0".equals(adasSensity)) { // 低
-			adasInterface.setWarningSensitivity(0);
-		} else if ("2".equals(adasSensity)) { // 高
-			adasInterface.setWarningSensitivity(2);
-		} else { // 中
-			adasInterface.setWarningSensitivity(1);
-		}
-
-		String adasThreshold = ProviderUtil.getValue(context,
-				Name.ADAS_THRESHOLD, "20"); // 设置最低预警车速，低于该速度不预警
-		if ("0".equals(adasThreshold)) {
-			adasInterface.setSpeedThreshold(0);
-		} else if ("50".equals(adasThreshold)) {
-			adasInterface.setSpeedThreshold(50);
-		} else if ("80".equals(adasThreshold)) {
-			adasInterface.setSpeedThreshold(80);
-		} else {
-			adasInterface.setSpeedThreshold(20);
-		}
-
-		// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
-		// adasInterface.setPerdestrain(ADASInterface.SET_OFF); // 行人识别？
-		// adasInterface.reCalibration(); // 重新对该摄像头校准
-	}
-
 	private void authAdas() {
-		if (TelephonyUtil.isNetworkConnected(context)
-				&& !ClickUtil.isAuthAdasTooQuick(5000)) {
-			MyLog.e("ADAS", "Auth Fail,re auth ADAS");
+		if (TelephonyUtil.isNetworkConnected(context)) {
 			new Thread(new AuthAdasThread()).start();
 		}
 	}
@@ -3136,55 +3041,18 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void run() {
-			LicenseInterface licenseInterface = new LicenseInterface();
 			if (licenseInterface.isLicensed(context)) {
+				MyLog.e("ADAS", "ADAS already licensed.");
 			} else {
 				int licenseState = licenseInterface.getLicense(context);
-				MyLog.i("[ADAS]licenseState:" + licenseState);
+				MyLog.i("ADAS", "licenseState:" + licenseState);
 				if (4 == licenseState) {
 					int restoreState = licenseInterface.restoreLicense(context);
-					MyLog.i("[ADAS]restoreState:" + restoreState);
+					MyLog.i("ADAS", "restoreState:" + restoreState);
 				}
 			}
 		}
 
-	}
-
-	/** 保存一张bitmap */
-	private void saveOneBitmap(Bitmap bitmap) {
-		File file = new File(
-				"/storage/sdcard0/ADAS_"
-						+ new SimpleDateFormat("yyyyMMdd-HH-mm-ss-SSS",
-								Locale.CHINESE).format(new Date()));
-		if (file.exists()) {
-			file.delete();
-		}
-		try {
-			FileOutputStream out = new FileOutputStream(file);
-			bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-			out.flush();
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void saveOneYUVImage(byte[] data) {
-		File fileTmp = new File(
-				"/storage/sdcard1/DrivingRecord/Image/"
-						+ new SimpleDateFormat("yyyy-MM-dd_HHmmss",
-								Locale.CHINESE).format(new Date()) + ".yuv");
-		try {
-			FileOutputStream fos = new FileOutputStream(fileTmp);
-			fos.write(data);
-			fos.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void setupBackRecorder() {
