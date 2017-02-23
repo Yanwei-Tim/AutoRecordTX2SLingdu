@@ -1,14 +1,8 @@
 package com.tchip.autorecord.ui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.Locale;
 
 import com.sinosmart.adas.ADASInterface;
 import com.sinosmart.adas.LicenseInterface;
@@ -51,7 +45,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.PorterDuff.Mode;
 import android.hardware.Camera;
-import android.location.Criteria;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
