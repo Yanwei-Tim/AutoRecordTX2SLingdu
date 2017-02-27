@@ -29,9 +29,9 @@ public class MyApp extends Application {
 	/**
 	 * 分辨率
 	 * 
-	 * Constant.Record.STATE_RESOLUTION_1080P
+	 * 1080
 	 * 
-	 * Constant.Record.STATE_RESOLUTION_720P
+	 * 720
 	 */
 	public static int resolutionState;
 
@@ -44,11 +44,6 @@ public class MyApp extends Application {
 	/** 语音停止录像 */
 	public static boolean shouldStopFrontFromVoice = false;
 	public static boolean shouldStopBackFromVoice = false;
-
-	/** ACC拍照后,在onFileSave中传Path给DSA */
-	public static boolean shouldSendPathToDSA = false;
-
-	public static boolean shouldSendPathToDSAUpload = false;
 
 	/** 前录是否正在录像 */
 	public static boolean isFrontRecording = false;
@@ -106,7 +101,7 @@ public class MyApp extends Application {
 
 	/** 是否正在显示内部存储空间过低对话框 */
 	public static boolean isFlashCleanDialogShow = false;
-	
+
 	public static boolean needDeleteLockHint = false;
 
 	private Context context;

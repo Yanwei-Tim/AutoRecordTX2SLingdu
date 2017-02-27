@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
 	private SurfaceView surfaceViewFront;
 	private SurfaceHolder surfaceHolderFront;
 	private TachographRecorder recorderFront;
-	private int intervalState = 1, muteState;
+	private int intervalState = 3, muteState;
 
 	// 后置
 	private RelativeLayout layoutBack;
@@ -745,7 +745,6 @@ public class MainActivity extends Activity {
 				MyApp.isAccOn = false;
 				MyApp.isAccOn = (1 == SettingUtil.getAccStatus());
 
-				MyApp.shouldSendPathToDSA = true;
 				takePhoto(true);
 			} else if (action.equals(Constant.Broadcast.ACC_ON)) {
 				MyApp.isAccOn = true;
@@ -753,16 +752,16 @@ public class MainActivity extends Activity {
 
 				// 重设视频分段
 				String videoTimeStr = sharedPreferences.getString("videoTime",
-						"1");
+						"3");
 				if ("5".equals(videoTimeStr)) { // 5
 					intervalState = 5;
 					setRecordInterval(300);
-				} else if ("3".equals(videoTimeStr)) { // 3
-					intervalState = 3;
-					setRecordInterval(180);
-				} else { // 1
+				} else if ("1".equals(videoTimeStr)) { // 1
 					intervalState = 1;
 					setRecordInterval(60);
+				} else { // 3
+					intervalState = 3;
+					setRecordInterval(180);
 				}
 
 				// 碰撞侦测服务
@@ -820,10 +819,8 @@ public class MainActivity extends Activity {
 						|| "take_photo_wenxin".equals(command)) {
 					takePhoto(MyApp.isAccOn);
 				} else if ("take_park_photo".equals(command)) { // 停车照片
-					MyApp.shouldSendPathToDSA = true;
 					takePhoto(MyApp.isAccOn);
 				} else if ("take_photo_dsa".equals(command)) { // 语音拍照上传
-					MyApp.shouldSendPathToDSAUpload = true;
 					takePhoto(MyApp.isAccOn);
 				}
 			} else if (action.equals(Constant.Broadcast.MEDIA_FORMAT)) {
@@ -885,13 +882,13 @@ public class MainActivity extends Activity {
 						setRecordInterval(300);
 						break;
 
-					case 3:
-						setRecordInterval(180);
+					case 1:
+						setRecordInterval(60);
 						break;
 
-					case 1:
+					case 3:
 					default:
-						setRecordInterval(60);
+						setRecordInterval(180);
 						break;
 					}
 				}
@@ -1548,14 +1545,14 @@ public class MainActivity extends Activity {
 					resetFrontTimeText();
 					textFrontTime.setVisibility(View.INVISIBLE);
 					textBackTime.setVisibility(View.INVISIBLE);
-					if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_1080P) {
-						setFrontResolution(Constant.Record.STATE_RESOLUTION_720P);
+					if (MyApp.resolutionState == 1080) {
+						setFrontResolution(720);
 						editor.putString("videoSize", "720");
 						MyApp.isFrontRecording = false;
 						speakVoice(getResources().getString(
 								R.string.hint_video_size_720));
-					} else if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_720P) {
-						setFrontResolution(Constant.Record.STATE_RESOLUTION_1080P);
+					} else if (MyApp.resolutionState == 720) {
+						setFrontResolution(1080);
 						editor.putString("videoSize", "1080");
 						MyApp.isFrontRecording = false;
 						speakVoice(getResources().getString(
@@ -2036,12 +2033,12 @@ public class MainActivity extends Activity {
 	/** 绘制录像按钮 */
 	private void setupFrontViews() {
 		// 视频分辨率
-		if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_720P) {
+		if (MyApp.resolutionState == 720) {
 			imageVideoSize.setImageDrawable(getResources().getDrawable(
 					R.drawable.video_size_hd, null));
 			textVideoSize.setText(getResources().getString(
 					R.string.icon_hint_720p));
-		} else if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_1080P) {
+		} else if (MyApp.resolutionState == 1080) {
 			imageVideoSize.setImageDrawable(getResources().getDrawable(
 					R.drawable.video_size_fhd, null));
 			textVideoSize.setText(getResources().getString(
@@ -2057,16 +2054,16 @@ public class MainActivity extends Activity {
 					R.drawable.video_length_5m, null));
 			textVideoLength.setText(getResources().getString(
 					R.string.icon_hint_5_minutes));
-		} else if (intervalState == 3) { // 3
-			imageVideoLength.setImageDrawable(getResources().getDrawable(
-					R.drawable.video_length_3m, null));
-			textVideoLength.setText(getResources().getString(
-					R.string.icon_hint_3_minutes));
-		} else { // 1
+		} else if (intervalState == 1) { // 1
 			imageVideoLength.setImageDrawable(getResources().getDrawable(
 					R.drawable.video_length_1m, null));
 			textVideoLength.setText(getResources().getString(
 					R.string.icon_hint_1_minute));
+		} else { // 3
+			imageVideoLength.setImageDrawable(getResources().getDrawable(
+					R.drawable.video_length_3m, null));
+			textVideoLength.setText(getResources().getString(
+					R.string.icon_hint_3_minutes));
 		}
 		// 视频加锁
 		imageFrontLock.setImageDrawable(getResources().getDrawable(
@@ -2470,23 +2467,25 @@ public class MainActivity extends Activity {
 					if (MyApp.isParkRecording) {
 						if (MyApp.isFrontRecording
 								&& secondFrontCount == Constant.Record.parkVideoLength) {
-							String videoTimeStr = sharedPreferences.getString(
-									"videoTime", "1");
-
-							if ("5".equals(videoTimeStr)) { // 5
-								intervalState = 5;
-							} else if ("3".equals(videoTimeStr)) { // 3
-								intervalState = 3;
-							} else { // 1
-								intervalState = 1;
-							}
-
 							MyLog.v("Front.updateFrontTimeHandler.Stop Park Record");
 							stopFrontRecorder5Times(); // 停止录像
 							stopBackRecorder5Times();
 							SettingUtil.setAirplaneMode(context, true);
-							setRecordInterval(("3".equals(videoTimeStr)) ? 3 * 60
-									: 1 * 60); // 重设视频分段
+
+							// 重设视频分段
+							String videoTimeStr = sharedPreferences.getString(
+									"videoTime", "3");
+							if ("5".equals(videoTimeStr)) { // 5
+								intervalState = 5;
+								setRecordInterval(300);
+							} else if ("1".equals(videoTimeStr)) { // 1
+								intervalState = 1;
+								setRecordInterval(60);
+							} else { // 3
+								intervalState = 3;
+								setRecordInterval(180);
+							}
+
 							ProviderUtil.setValue(context, Name.PARK_REC_STATE,
 									"0");
 							MyApp.isParkRecording = false;
@@ -2542,17 +2541,17 @@ public class MainActivity extends Activity {
 
 				// 碰撞后判断是否需要加锁第二段视频
 				if (intervalState == 5) {
-					if (secondFrontCount > 285) {
+					if (secondFrontCount > 295) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
-				} else if (intervalState == 3) { // 3
-					if (secondFrontCount > 165) {
+				} else if (intervalState == 1) { // 1
+					if (secondFrontCount > 55) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
-				} else { // 1
-					if (secondFrontCount > 45) {
+				} else { // 3
+					if (secondFrontCount > 175) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
@@ -2858,18 +2857,18 @@ public class MainActivity extends Activity {
 	}
 
 	private void refreshFrontButton() {
-		String videoSizeStr = sharedPreferences.getString("videoSize", "720");
-		MyApp.resolutionState = "1080".equals(videoSizeStr) ? Constant.Record.STATE_RESOLUTION_1080P
-				: Constant.Record.STATE_RESOLUTION_720P;
+		String videoSizeStr = sharedPreferences.getString("videoSize", "1080");
+		MyApp.resolutionState = Integer.parseInt(videoSizeStr);
 
-		String videoTimeStr = sharedPreferences.getString("videoTime", "1"); // 视频分段
+		String videoTimeStr = sharedPreferences.getString("videoTime", "3"); // 视频分段
 
 		if ("5".equals(videoTimeStr)) { // 5
 			intervalState = 5;
-		} else if ("3".equals(videoTimeStr)) { // 3
-			intervalState = 3;
-		} else { // 1
+		} else if ("1".equals(videoTimeStr)) { // 1
 			intervalState = 1;
+		} else { // 3
+			intervalState = 3;
+
 		}
 	}
 
@@ -2961,21 +2960,21 @@ public class MainActivity extends Activity {
 				"Image");
 
 		recorderFront.setClientName(this.getPackageName());
-		if (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_1080P) {
-			recorderFront.setVideoSize(1920, 1080); // 分辨率
-			recorderFront.setVideoFrameRate(Constant.Record.FRONT_FRAME_1080P);
-			recorderFront.setVideoBiteRate(Constant.Record.FRONT_BITRATE_1080P);
-		} else {
+		if (MyApp.resolutionState == 720) { // 分辨率
 			recorderFront.setVideoSize(1280, 720);
 			recorderFront.setVideoFrameRate(Constant.Record.FRONT_FRAME_720P);
 			recorderFront.setVideoBiteRate(Constant.Record.FRONT_BITRATE_720P);
+		} else {
+			recorderFront.setVideoSize(1920, 1080);
+			recorderFront.setVideoFrameRate(Constant.Record.FRONT_FRAME_1080P);
+			recorderFront.setVideoBiteRate(Constant.Record.FRONT_BITRATE_1080P);
 		}
 		if (intervalState == 5) { // 分段
 			recorderFront.setVideoSeconds(300);
-		} else if (intervalState == 3) {
-			recorderFront.setVideoSeconds(180);
-		} else {
+		} else if (intervalState == 1) {
 			recorderFront.setVideoSeconds(60);
+		} else {
+			recorderFront.setVideoSeconds(180);
 		}
 		recorderFront.setVideoOverlap(0); // 重叠
 		if (null != sharedPreferences) { // 录音
@@ -3075,10 +3074,10 @@ public class MainActivity extends Activity {
 			recorderBack.setVideoBiteRate(Constant.Record.BACK_BITRATE);
 			if (intervalState == 5) {
 				recorderBack.setVideoSeconds(300);
-			} else if (intervalState == 3) {
-				recorderBack.setVideoSeconds(180);
-			} else {
+			} else if (intervalState == 1) {
 				recorderBack.setVideoSeconds(60);
+			} else {
+				recorderBack.setVideoSeconds(180);
 			}
 			recorderBack.setVideoOverlap(0);
 			recorderBack.prepare();
@@ -3176,14 +3175,9 @@ public class MainActivity extends Activity {
 			try {
 				if (type == 1) { // 视频
 					new Thread(new ReleaseFrontStorageThread()).start();
-
 					String videoName = path.split("/")[5];
-					int videoResolution = (MyApp.resolutionState == Constant.Record.STATE_RESOLUTION_720P) ? 720
-							: 1080;
-					int videoLock = 0;
 
 					if (MyApp.isFrontLock) {
-						videoLock = 1;
 						MyApp.isFrontLock = false; // 还原
 						StorageUtil.lockVideo(true, videoName);
 
@@ -3201,26 +3195,7 @@ public class MainActivity extends Activity {
 							.getString(R.string.hint_photo_save));
 
 					new Thread(new WriteImageExifThread(path)).start();
-					if (MyApp.shouldSendPathToDSA) { // 停车守卫拍照
-						MyApp.shouldSendPathToDSA = false;
-						String[] picPaths = new String[2]; // 第一张保存前置的图片路径
-						picPaths[0] = path;
-						picPaths[1] = "";
-						Intent intent = new Intent(
-								Constant.Broadcast.SEND_PIC_PATH);
-						intent.putExtra("picture", picPaths);
-						sendBroadcast(intent);
-						MyLog.v("SendDSA,Path:" + picPaths[0]);
-					}
 
-					if (MyApp.shouldSendPathToDSAUpload) { // 语音拍照上传
-						MyApp.shouldSendPathToDSAUpload = false;
-						Intent intentDsaUpload = new Intent(
-								Constant.Broadcast.SEND_DSA_UPLOAD_PATH);
-						intentDsaUpload.putExtra("share_picture", path);
-						sendBroadcast(intentDsaUpload);
-						MyLog.v("SendDSAUpload,Path:" + path);
-					}
 					// 通知语音
 					Intent intentImageSave = new Intent(
 							Constant.Broadcast.ACTION_IMAGE_SAVE);

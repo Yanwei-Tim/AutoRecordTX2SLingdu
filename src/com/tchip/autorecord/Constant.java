@@ -112,40 +112,6 @@ public interface Constant {
 		 */
 		public static final String SPEECH_COMMAND = "com.tchip.SPEECH_COMMAND";
 
-		/** 杀死语音 */
-		public static final String AISPEECH_OFF = "com.tchip.aiSpeechSleep"; // "com.tchip.AISPEECH_OFF";
-
-		/**
-		 * 行车记录仪抓拍到图片之后发送以下广播,DSA接收
-		 * 
-		 * String[] picPaths = new String[2]; //第一张保存前置的图片路径 ；第二张保存后置的，如无可以为空
-		 * 
-		 * Intent intent = new Intent("com.action.http.post.picture");
-		 * 
-		 * intent.putExtra("picture", picPaths);
-		 * 
-		 * sendBroadcast(intent);
-		 */
-		public static final String SEND_PIC_PATH = "com.action.http.post.picture";
-
-		/**
-		 * 语音拍照上传，发送路径给DSA
-		 * 
-		 * intent.putExtra("share_picture",path) String 类型
-		 */
-		public static final String SEND_DSA_UPLOAD_PATH = "com.action.dsa.share.picture";
-
-		/**
-		 * DSA接收到广播之后进行图片的上传成功之后返回广播：
-		 * 
-		 * Intent intent = new Intent("dsa.action.http.picture.result");
-		 * 
-		 * intent.putExtra("result",1); // 0失败 1成功
-		 * 
-		 * sendBroadcast(intent);
-		 */
-		public static final String GET_PIC_RESULT = "dsa.action.http.picture.result";
-
 		/**
 		 * 照片保存广播
 		 * 
@@ -225,10 +191,6 @@ public interface Constant {
 		public static final int FRONT_FRAME_720P = 24;
 		public static final int FRONT_FRAME_1080P = 24;
 		public static final int BACK_FRAME = 25;
-
-		// 分辨率
-		public static final int STATE_RESOLUTION_720P = 0;
-		public static final int STATE_RESOLUTION_1080P = 1;
 
 		// 录像状态
 		public static final int STATE_RECORD_STARTED = 0;
