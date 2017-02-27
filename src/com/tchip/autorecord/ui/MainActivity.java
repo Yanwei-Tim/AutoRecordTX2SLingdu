@@ -455,7 +455,6 @@ public class MainActivity extends Activity {
 			}
 		} catch (Exception e) {
 			MyLog.e("GPS", "updateSpeedByLocation catch:" + e.toString());
-
 		}
 	}
 
@@ -788,7 +787,7 @@ public class MainActivity extends Activity {
 				}
 			} else if (action.equals(Constant.Broadcast.SPEECH_COMMAND)) {
 				String command = intent.getExtras().getString("command");
-				if ("open_dvr".equals(command)) {
+				if ("open_dvr".equals(command) || "dvr_record".equals(command)) {
 					if (MyApp.isAccOn) {
 						if (!isFrontRecord()) {
 							MyApp.shouldMountRecordFront = true;
@@ -808,7 +807,8 @@ public class MainActivity extends Activity {
 							MyApp.shouldMountRecordBack = true;
 						}
 					}
-				} else if ("stop_dvr".equals(command)) {
+				} else if ("stop_dvr".equals(command)
+						|| "dvr_stop_record".equals(command)) {
 					if (isFrontRecord()) {
 						MyApp.shouldStopFrontFromVoice = true;
 					}
@@ -822,6 +822,43 @@ public class MainActivity extends Activity {
 					takePhoto(MyApp.isAccOn);
 				} else if ("take_photo_dsa".equals(command)) { // 语音拍照上传
 					takePhoto(MyApp.isAccOn);
+				} else if ("dvr_record_lock".equals(command)) { // 录像加锁
+					MyApp.isFrontLock = true;
+					MyApp.isBackLock = true;
+				} else if ("dvr_record_unlock".equals(command)) { // 录像解锁
+					MyApp.isFrontLock = false;
+					MyApp.isBackLock = false;
+				} else if ("dvr_record_mic_open".equals(command)) { // 打开录音-UNMUTE
+					// 切换录音/静音状态停止录像，需要重置时间
+					if (muteState == Constant.Record.STATE_MUTE) {
+						MyApp.shouldVideoRecordWhenChangeMute = MyApp.isFrontRecording;
+						setFrontMute(false, true);
+						muteState = Constant.Record.STATE_UNMUTE;
+						editor.putBoolean("videoMute", false);
+						editor.commit();
+						setupFrontViews();
+						if (MyApp.shouldVideoRecordWhenChangeMute) { // 修改录音/静音后按需还原录像状态
+							MyApp.shouldVideoRecordWhenChangeMute = false;
+							new Thread(new StartRecordWhenChangeMuteThread())
+									.start();
+						}
+					}
+				} else if ("dvr_record_mic_close".equals(command)) { // 关闭录音-MUTE
+					// 切换录音/静音状态停止录像，需要重置时间
+					if (muteState == Constant.Record.STATE_UNMUTE) {
+						MyApp.shouldVideoRecordWhenChangeMute = MyApp.isFrontRecording;
+						setFrontMute(true, true);
+						muteState = Constant.Record.STATE_MUTE;
+						editor.putBoolean("videoMute", true);
+						editor.commit();
+
+						setupFrontViews();
+						if (MyApp.shouldVideoRecordWhenChangeMute) { // 修改录音/静音后按需还原录像状态
+							MyApp.shouldVideoRecordWhenChangeMute = false;
+							new Thread(new StartRecordWhenChangeMuteThread())
+									.start();
+						}
+					}
 				}
 			} else if (action.equals(Constant.Broadcast.MEDIA_FORMAT)) {
 				String path = intent.getExtras().getString("path");

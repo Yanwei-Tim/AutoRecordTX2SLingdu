@@ -102,7 +102,7 @@ public interface Constant {
 		 * 
 		 * 1.语音拍照：take_photo
 		 * 
-		 * 2.语音开始录像：open_dvr
+		 * 2.语音开始录像：open_dvr | dvr_record
 		 * 
 		 * 3.语音停止录像：close_dvr
 		 * 
