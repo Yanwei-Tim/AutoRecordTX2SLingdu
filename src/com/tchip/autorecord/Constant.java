@@ -266,11 +266,6 @@ public interface Constant {
 		/** 是否使用系统Camera参数 */
 		public static final boolean useSystemCameraParam = true;
 
-		/**
-		 * TX2S 9.76倒车是否全屏
-		 */
-		public static final boolean isTX2SBackFull = true;
-
 		/** 是否可以侦测后拉CVBS状态（仅有TX5支持） */
 		public static final boolean hasCVBSDetect = false;
 	}

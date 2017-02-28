@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 
 	// 前置
 	private RelativeLayout layoutFront;
-	private TextView textFrontTime, textBackTime; // 时间跑秒
+	private TextView textFrontTime; // 时间跑秒
 	private ImageButton imageFrontState; // 录像按钮
 	private ImageButton imageFrontLock; // 加锁按钮
 	private TextView textFrontLock;
@@ -102,12 +102,6 @@ public class MainActivity extends Activity {
 
 	// 后置
 	private RelativeLayout layoutBack;
-	private RelativeLayout layoutBackRecord;
-	// private ImageButton imageBackState;
-	private ImageButton imageBackLock;
-	private TextView textBackLock;
-	private ImageButton imageBackSwitch;
-	private TextView textBackSwitch;
 	private Camera cameraBack;
 	private SurfaceView surfaceViewBack;
 	private SurfaceHolder surfaceHolderBack;
@@ -157,11 +151,7 @@ public class MainActivity extends Activity {
 		CAMERA_HEIGHT = 455;
 
 		setStatusBarVisible(true);
-		if (Constant.Module.isTX2SBackFull) {
-			setContentView(R.layout.activity_main_tx2s);
-		} else {
-			setContentView(R.layout.activity_main);
-		}
+		setContentView(R.layout.activity_main_tx2s);
 
 		context = getApplicationContext();
 		powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE); // 获取屏幕状态
@@ -519,36 +509,32 @@ public class MainActivity extends Activity {
 	 * @param big
 	 */
 	private void setBackPreviewBig(boolean big) {
-		if (Constant.Module.isTX2SBackFull) {
-			MyLog.i("setBackPreviewBig:" + big);
-			if (big) {
-				setStatusBarVisible(false);
-				layoutBack.setVisibility(View.VISIBLE);
-				surfaceViewBack
-						.setLayoutParams(new RelativeLayout.LayoutParams(1920,
-								480)); // 1920 * 480
-				surfaceViewFront
-						.setLayoutParams(new RelativeLayout.LayoutParams(1, 1));
-				layoutFront.setVisibility(View.GONE);
+		MyLog.i("setBackPreviewBig:" + big);
+		if (big) {
+			setStatusBarVisible(false);
+			layoutBack.setVisibility(View.VISIBLE);
+			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
+					1920, 480)); // 1920 * 480
+			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
+					1));
+			layoutFront.setVisibility(View.GONE);
 
-				String strBackState = ProviderUtil.getValue(context,
-						Name.BACK_CAR_STATE, "0");
-				if ("1".equals(strBackState)) {
-					setBackLineVisible(true);
-				} else {
-					setBackLineVisible(false);
-				}
+			String strBackState = ProviderUtil.getValue(context,
+					Name.BACK_CAR_STATE, "0");
+			if ("1".equals(strBackState)) {
+				setBackLineVisible(true);
 			} else {
 				setBackLineVisible(false);
-				setStatusBarVisible(true);
-				layoutBack.setVisibility(View.VISIBLE);
-				surfaceViewBack
-						.setLayoutParams(new RelativeLayout.LayoutParams(
-								CAMERA_WIDTH, CAMERA_HEIGHT)); // 1280 * 445
-				surfaceViewFront
-						.setLayoutParams(new RelativeLayout.LayoutParams(1, 1));
-				layoutFront.setVisibility(View.GONE);
 			}
+		} else {
+			setBackLineVisible(false);
+			setStatusBarVisible(true);
+			layoutBack.setVisibility(View.VISIBLE);
+			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
+					CAMERA_WIDTH, CAMERA_HEIGHT)); // 1280 * 445
+			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
+					1));
+			layoutFront.setVisibility(View.GONE);
 		}
 	}
 
@@ -1141,10 +1127,8 @@ public class MainActivity extends Activity {
 
 	/** 初始化布局 */
 	private void initialLayout() {
-		MyOnClickListener myOnClickListener = new MyOnClickListener();
 		layoutBack = (RelativeLayout) findViewById(R.id.layoutBack);
 		layoutBack.setVisibility(View.GONE);
-		layoutBackRecord = (RelativeLayout) findViewById(R.id.layoutBackRecord);
 		initialBackSurface(); // 后置
 
 		layoutFront = (RelativeLayout) findViewById(R.id.layoutFront);
@@ -1152,10 +1136,7 @@ public class MainActivity extends Activity {
 		initialFrontSurface(); // 前置
 
 		textFrontTime = (TextView) findViewById(R.id.textFrontTime);
-		textBackTime = (TextView) findViewById(R.id.textBackTime);
 		textFrontTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
-				+ "Font-Quartz-Regular.ttf"));
-		textBackTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
 				+ "Font-Quartz-Regular.ttf"));
 
 		// 录制
@@ -1168,21 +1149,11 @@ public class MainActivity extends Activity {
 		textFrontLock = (TextView) findViewById(R.id.textFrontLock);
 		textFrontLock.setOnClickListener(myOnClickListener);
 
-		imageBackLock = (ImageButton) findViewById(R.id.imageBackLock);
-		imageBackLock.setOnClickListener(myOnClickListener);
-		textBackLock = (TextView) findViewById(R.id.textBackLock);
-		textFrontLock.setOnClickListener(myOnClickListener);
-
 		// 前后切换图标
 		imageFrontSwitch = (ImageButton) findViewById(R.id.imageFrontSwitch);
 		imageFrontSwitch.setOnClickListener(myOnClickListener);
 		textFrontSwitch = (TextView) findViewById(R.id.textFrontSwitch);
 		textFrontSwitch.setOnClickListener(myOnClickListener);
-
-		imageBackSwitch = (ImageButton) findViewById(R.id.imageBackSwitch);
-		imageBackSwitch.setOnClickListener(myOnClickListener);
-		textBackSwitch = (TextView) findViewById(R.id.textBackSwitch);
-		textBackSwitch.setOnClickListener(myOnClickListener);
 
 		// 拍照
 		imagePhotoTake = (ImageButton) findViewById(R.id.imagePhotoTake);
@@ -1254,7 +1225,6 @@ public class MainActivity extends Activity {
 					CAMERA_WIDTH, CAMERA_HEIGHT)); // 854,480
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
-			layoutFront.setVisibility(View.GONE);
 
 			String strBackState = ProviderUtil.getValue(context,
 					Name.BACK_CAR_STATE, "0");
@@ -1301,12 +1271,11 @@ public class MainActivity extends Activity {
 			break;
 
 		case 1:
-			layoutBack.setVisibility(View.VISIBLE);
+			layoutFront.setVisibility(View.VISIBLE);
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
 					CAMERA_WIDTH, CAMERA_HEIGHT)); // 854,480
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
-			layoutFront.setVisibility(View.GONE);
 			break;
 
 		case 2: { // FRONT + BACK
@@ -1337,20 +1306,12 @@ public class MainActivity extends Activity {
 		if (isVisible) {
 			// 确保显示后摄,解决倒车线在前摄界面
 			layoutBack.setVisibility(View.VISIBLE);
-			if (Constant.Module.isTX2SBackFull) {
-				surfaceViewBack
-						.setLayoutParams(new RelativeLayout.LayoutParams(1920,
-								480));
-			} else {
-				surfaceViewBack
-						.setLayoutParams(new RelativeLayout.LayoutParams(
-								CAMERA_WIDTH, CAMERA_HEIGHT));
-			}
+			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
+					1920, 480));
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 			layoutFront.setVisibility(View.GONE);
 
-			layoutBackRecord.setVisibility(View.GONE);
 			layoutBackLineControl.setVisibility(View.VISIBLE);
 			String strBackLineShow = ProviderUtil.getValue(context,
 					Name.BACK_LINE_SHOW, "1");
@@ -1364,7 +1325,6 @@ public class MainActivity extends Activity {
 		} else {
 			layoutBackLineControl.setVisibility(View.GONE);
 			layoutBackLine.removeAllViews();
-			layoutBackRecord.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -1390,6 +1350,8 @@ public class MainActivity extends Activity {
 			acquireFullWakeLock(); // 处理开机时已经在倒车情形
 		}
 	}
+
+	private MyOnClickListener myOnClickListener = new MyOnClickListener();
 
 	class MyOnClickListener implements View.OnClickListener {
 		@Override
@@ -1509,8 +1471,6 @@ public class MainActivity extends Activity {
 
 			case R.id.imageFrontLock:
 			case R.id.textFrontLock:
-			case R.id.imageBackLock:
-			case R.id.textBackLock:
 				if (!ClickUtil.isQuickClick(500)) {
 					if (MyApp.isFrontRecording) {
 						lockOrUnlockVideo();
@@ -1529,7 +1489,6 @@ public class MainActivity extends Activity {
 					MyApp.isFrontRecording = false;
 					resetFrontTimeText();
 					textFrontTime.setVisibility(View.INVISIBLE);
-					textBackTime.setVisibility(View.INVISIBLE);
 					if (MyApp.resolutionState == 1080) {
 						setFrontResolution(720);
 						editor.putString("videoSize", "720");
@@ -1618,17 +1577,14 @@ public class MainActivity extends Activity {
 					if (cameraBeforeBack == 0) {
 						switchCameraTo(2); // TODO:FIXME
 						cameraBeforeBack = 2;
-					} else {
+					} else if (cameraBeforeBack == 2) {
 						switchCameraTo(1);
 						cameraBeforeBack = 1;
+					} else {
+						switchCameraTo(0);
+						cameraBeforeBack = 0;
 					}
 				}
-				break;
-
-			case R.id.imageBackSwitch:
-			case R.id.textBackSwitch:
-				switchCameraTo(0);
-				cameraBeforeBack = 0;
 				break;
 
 			case R.id.imageBackLineShow:
@@ -1816,7 +1772,6 @@ public class MainActivity extends Activity {
 		if (isFrontRecord()) {
 			new Thread(new StopFrontRecordThread()).start();
 			textFrontTime.setVisibility(View.INVISIBLE);
-			textBackTime.setVisibility(View.INVISIBLE);
 			resetFrontTimeText();
 		}
 	}
@@ -2045,12 +2000,6 @@ public class MainActivity extends Activity {
 		textFrontLock.setText(getResources().getString(
 				MyApp.isFrontLock ? R.string.icon_hint_lock
 						: R.string.icon_hint_unlock));
-		imageBackLock.setImageDrawable(getResources().getDrawable(
-				MyApp.isFrontLock ? R.drawable.video_lock
-						: R.drawable.video_unlock, null));
-		textBackLock.setText(getResources().getString(
-				MyApp.isFrontLock ? R.string.icon_hint_lock
-						: R.string.icon_hint_unlock));
 		// 静音按钮
 		boolean videoMute = sharedPreferences.getBoolean("videoMute",
 				Constant.Record.muteDefault);
@@ -2276,7 +2225,6 @@ public class MainActivity extends Activity {
 			if (!MyApp.isFrontRecording) {
 				MyApp.isFrontRecording = true;
 				textFrontTime.setVisibility(View.VISIBLE);
-				textBackTime.setVisibility(View.VISIBLE);
 				startUpdateFrontTimeThread();
 				setupRecordViews();
 			}
@@ -2284,7 +2232,6 @@ public class MainActivity extends Activity {
 			if (MyApp.isFrontRecording) {
 				MyApp.isFrontRecording = false;
 				textFrontTime.setVisibility(View.INVISIBLE);
-				textBackTime.setVisibility(View.INVISIBLE);
 				resetFrontTimeText();
 				MyApp.isUpdateFrontTimeRun = false;
 				setupRecordViews();
@@ -2328,7 +2275,6 @@ public class MainActivity extends Activity {
 	private void resetFrontTimeText() {
 		secondFrontCount = -1;
 		textFrontTime.setText("00 : 00");
-		textBackTime.setText("00 : 00");
 	}
 
 	/** 开启录像跑秒线程 */
@@ -2480,8 +2426,6 @@ public class MainActivity extends Activity {
 					break;
 				}
 				textFrontTime.setText(DateUtil
-						.getFormatTimeBySecond(secondFrontCount));
-				textBackTime.setText(DateUtil
 						.getFormatTimeBySecond(secondFrontCount));
 
 				this.removeMessages(1);
