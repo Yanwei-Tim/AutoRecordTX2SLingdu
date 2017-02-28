@@ -47,7 +47,7 @@ public class StorageUtil {
 	public static boolean isFrontCardExist() {
 		boolean isVideoCardExist = false;
 		try {
-			String pathVideo = Constant.Path.VIDEO_FRONT_SD;
+			String pathVideo = Constant.Path.VIDEO_FRONT_TOTAL;
 			File fileVideo = new File(pathVideo);
 			boolean isSuccess = fileVideo.mkdirs();
 			MyLog.v("StorageUtil.isVideoCardExists,mkdirs isSuccess:"
@@ -70,7 +70,7 @@ public class StorageUtil {
 	public static boolean isBackCardExist() {
 		boolean isVideoCardExist = false;
 		try {
-			String pathVideo = Constant.Path.VIDEO_BACK_SD;
+			String pathVideo = Constant.Path.VIDEO_BACK_TOTAL;
 			File fileVideo = new File(pathVideo);
 			boolean isSuccess = fileVideo.mkdirs();
 			MyLog.v("StorageUtil.isVideoCardExists,mkdirs isSuccess:"
@@ -92,8 +92,15 @@ public class StorageUtil {
 	/** 创建前后录像存储卡目录 */
 	public static void createRecordDirectory() {
 		try {
-			new File(Constant.Path.VIDEO_FRONT_SD).mkdirs();
-			new File(Constant.Path.VIDEO_BACK_SD).mkdirs();
+			new File(Constant.Path.VIDEO_FRONT_TOTAL).mkdirs();
+			new File(Constant.Path.VIDEO_FRONT_UNLOCK).mkdirs();
+			new File(Constant.Path.VIDEO_FRONT_LOCK).mkdirs();
+
+			new File(Constant.Path.VIDEO_BACK_TOTAL).mkdirs();
+			new File(Constant.Path.VIDEO_BACK_UNLOCK).mkdirs();
+			new File(Constant.Path.VIDEO_BACK_LOCK).mkdirs();
+
+			new File(Constant.Path.IMAGE_BOTH).mkdirs();
 		} catch (Exception e) {
 		}
 	}
@@ -130,11 +137,11 @@ public class StorageUtil {
 
 	/** 将加锁视频移动到加锁文件夹 */
 	public static void lockVideo(boolean isFront, String videoName) {
-		String rawPath = isFront ? Constant.Path.VIDEO_FRONT_SD
-				: Constant.Path.VIDEO_BACK_SD;
-		String lockPath = isFront ? Constant.Path.VIDEO_FRONT_SD_LOCK
-				: Constant.Path.VIDEO_BACK_SD_LOCK;
-		File rawFile = new File(rawPath + videoName);
+		String rawPath = isFront ? Constant.Path.VIDEO_FRONT_UNLOCK
+				: Constant.Path.VIDEO_BACK_UNLOCK;
+		String lockPath = isFront ? Constant.Path.VIDEO_FRONT_LOCK
+				: Constant.Path.VIDEO_BACK_LOCK;
+		File rawFile = new File(rawPath + File.separator + videoName);
 		if (rawFile.exists() && rawFile.isFile()) {
 			File lockDir = new File(lockPath);
 			if (!lockDir.exists()) {
@@ -158,7 +165,7 @@ public class StorageUtil {
 					&& !frontVideoName.startsWith(".")) {
 				String videoPrefix = frontVideoName.substring(0, 15);
 				MyLog.v("[deleteBackByFront]videoPrefix:" + videoPrefix);
-				File dirBack = new File(Constant.Path.VIDEO_BACK_SD);
+				File dirBack = new File(Constant.Path.VIDEO_BACK_UNLOCK);
 				File[] childFiles = dirBack.listFiles();
 				for (File childFile : childFiles) {
 					if (childFile.getName().startsWith(videoPrefix)
@@ -268,7 +275,7 @@ public class StorageUtil {
 					&& !backVideoName.startsWith(".")) {
 				String videoPrefix = backVideoName.substring(0, 15);
 				MyLog.v("[deleteFrontByBack]videoPrefix:" + videoPrefix);
-				File dirBack = new File(Constant.Path.VIDEO_FRONT_SD);
+				File dirBack = new File(Constant.Path.VIDEO_FRONT_UNLOCK);
 				File[] childFiles = dirBack.listFiles();
 				for (File childFile : childFiles) {
 					if (childFile.getName().startsWith(videoPrefix)
@@ -437,7 +444,7 @@ public class StorageUtil {
 		}
 		try {
 			while (FileUtil.isFrontStorageLess()) {
-				List<File> listFrontUnLock = listFileSortByModifyTime(Constant.Path.VIDEO_FRONT_SD);
+				List<File> listFrontUnLock = listFileSortByModifyTime(Constant.Path.VIDEO_FRONT_UNLOCK);
 				if (listFrontUnLock.size() > 0) { // 未加锁视频
 					File fileOldest = listFrontUnLock.get(0);
 					String fileName = fileOldest.getName();
@@ -451,7 +458,7 @@ public class StorageUtil {
 						deleteBackByFront(context, fileName); // 删除同时段后录视频
 					}
 				} else { // 加锁视频
-					List<File> listFrontLock = listFileSortByModifyTime(Constant.Path.VIDEO_FRONT_SD_LOCK);
+					List<File> listFrontLock = listFileSortByModifyTime(Constant.Path.VIDEO_FRONT_LOCK);
 					if (listFrontLock.size() > 0) {
 						File fileOldest = listFrontLock.get(0);
 						String fileName = fileOldest.getName();
@@ -476,7 +483,7 @@ public class StorageUtil {
 				}
 			}
 			while (FileUtil.isFrontLockLess()) { // 前置加锁
-				List<File> listFrontLock = listFileSortByModifyTime(Constant.Path.VIDEO_FRONT_SD_LOCK);
+				List<File> listFrontLock = listFileSortByModifyTime(Constant.Path.VIDEO_FRONT_LOCK);
 				if (listFrontLock.size() > 0) {
 					File fileOldest = listFrontLock.get(0);
 					String fileName = fileOldest.getName();
@@ -514,7 +521,7 @@ public class StorageUtil {
 		}
 		try {
 			while (FileUtil.isBackStorageLess()) {
-				List<File> listBackUnLock = listFileSortByModifyTime(Constant.Path.VIDEO_BACK_SD);
+				List<File> listBackUnLock = listFileSortByModifyTime(Constant.Path.VIDEO_BACK_UNLOCK);
 				if (listBackUnLock.size() > 0) { // 未加锁视频
 					File fileOldest = listBackUnLock.get(0);
 					String fileName = fileOldest.getName();
@@ -528,7 +535,7 @@ public class StorageUtil {
 						deleteFrontByBack(context, fileName); // 删除同时段后录视频
 					}
 				} else { // 加锁视频
-					List<File> listBackLock = listFileSortByModifyTime(Constant.Path.VIDEO_BACK_SD_LOCK);
+					List<File> listBackLock = listFileSortByModifyTime(Constant.Path.VIDEO_BACK_LOCK);
 					if (listBackLock.size() > 0) {
 						File fileOldest = listBackLock.get(0);
 						String fileName = fileOldest.getName();
@@ -553,7 +560,7 @@ public class StorageUtil {
 				}
 			}
 			while (FileUtil.isBackLockLess()) { // 后置加锁
-				List<File> listBackLock = listFileSortByModifyTime(Constant.Path.VIDEO_BACK_SD_LOCK);
+				List<File> listBackLock = listFileSortByModifyTime(Constant.Path.VIDEO_BACK_LOCK);
 				if (listBackLock.size() > 0) {
 					File fileOldest = listBackLock.get(0);
 					String fileName = fileOldest.getName();

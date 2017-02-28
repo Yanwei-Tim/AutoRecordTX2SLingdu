@@ -52,7 +52,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -63,7 +62,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.SurfaceHolder.Callback;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -127,25 +125,7 @@ public class MainActivity extends Activity {
 
 	private Handler mMainHandler; // 主线程Handler
 
-	private enum UIConfig {
-		/** 公版 6.86 */
-		TQ6,
-		/** 善领 6.86 */
-		SL6,
-		/** 公版 7.84 */
-		TQ7,
-		/** 善领 7.84 */
-		SL7,
-		/** 公版 9.76 */
-		TQ9,
-		/** 善领 9.76 */
-		SL9
-	}
-
-	private String brand = "TQ";
-	private String model = "TX2";
 	/** UI配置 */
-	private UIConfig uiConfig = UIConfig.TQ6;
 	private int CAMERA_WIDTH = 1184;
 	private int CAMERA_HEIGHT = 455; // 480;
 
@@ -173,32 +153,13 @@ public class MainActivity extends Activity {
 		mMainHandler = new Handler(this.getMainLooper());
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		brand = Build.BRAND;
-		model = Build.MODEL;
-		if ("TX2S".equals(model)) { // TX2S-9.76
-
-			if ("SL".equals(brand)) {
-				uiConfig = UIConfig.SL9;
-			} else {
-				uiConfig = UIConfig.TQ9;
-			}
-		}
-
 		CAMERA_WIDTH = 1280;
 		CAMERA_HEIGHT = 455;
-		uiConfig = UIConfig.SL9;
 
-		if ("TX2S".equals(model)) {
-			setStatusBarVisible(true);
-			if (Constant.Module.isTX2SBackFull) {
-				setContentView(R.layout.activity_main_tx2s);
-			} else {
-				setContentView(R.layout.activity_main);
-			}
+		setStatusBarVisible(true);
+		if (Constant.Module.isTX2SBackFull) {
+			setContentView(R.layout.activity_main_tx2s);
 		} else {
-			// setStatusBarVisible(false);
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			setContentView(R.layout.activity_main);
 		}
 
@@ -251,8 +212,7 @@ public class MainActivity extends Activity {
 		setupFrontDefaults();
 		setupBackDefaults();
 
-		setupFrontViews();
-		setupBackViews();
+		setupRecordViews();
 
 		// 首次启动是否需要自动录像
 		if (1 == SettingUtil.getAccStatus()) {
@@ -328,8 +288,7 @@ public class MainActivity extends Activity {
 
 		try {
 			refreshFrontButton(); // 更新录像界面按钮状态
-			setupFrontViews();
-			setupBackViews();
+			setupRecordViews();
 		} catch (Exception e) {
 			e.printStackTrace();
 			MyLog.e("onResume catch Exception:" + e.toString());
@@ -560,7 +519,7 @@ public class MainActivity extends Activity {
 	 * @param big
 	 */
 	private void setBackPreviewBig(boolean big) {
-		if (Constant.Module.isTX2SBackFull && "TX2S".equals(model)) {
+		if (Constant.Module.isTX2SBackFull) {
 			MyLog.i("setBackPreviewBig:" + big);
 			if (big) {
 				setStatusBarVisible(false);
@@ -836,7 +795,7 @@ public class MainActivity extends Activity {
 						muteState = Constant.Record.STATE_UNMUTE;
 						editor.putBoolean("videoMute", false);
 						editor.commit();
-						setupFrontViews();
+						setupRecordViews();
 						if (MyApp.shouldVideoRecordWhenChangeMute) { // 修改录音/静音后按需还原录像状态
 							MyApp.shouldVideoRecordWhenChangeMute = false;
 							new Thread(new StartRecordWhenChangeMuteThread())
@@ -852,7 +811,7 @@ public class MainActivity extends Activity {
 						editor.putBoolean("videoMute", true);
 						editor.commit();
 
-						setupFrontViews();
+						setupRecordViews();
 						if (MyApp.shouldVideoRecordWhenChangeMute) { // 修改录音/静音后按需还原录像状态
 							MyApp.shouldVideoRecordWhenChangeMute = false;
 							new Thread(new StartRecordWhenChangeMuteThread())
@@ -1325,8 +1284,7 @@ public class MainActivity extends Activity {
 		}
 		// 更新录像界面按钮状态
 		refreshFrontButton();
-		setupFrontViews();
-		setupBackViews();
+		setupRecordViews();
 	}
 
 	/** 切换前后摄像画面 */
@@ -1379,7 +1337,7 @@ public class MainActivity extends Activity {
 		if (isVisible) {
 			// 确保显示后摄,解决倒车线在前摄界面
 			layoutBack.setVisibility(View.VISIBLE);
-			if ("TX2S".equals(model) && Constant.Module.isTX2SBackFull) {
+			if (Constant.Module.isTX2SBackFull) {
 				surfaceViewBack
 						.setLayoutParams(new RelativeLayout.LayoutParams(1920,
 								480));
@@ -1551,24 +1509,14 @@ public class MainActivity extends Activity {
 
 			case R.id.imageFrontLock:
 			case R.id.textFrontLock:
-				if (!ClickUtil.isQuickClick(500)) {
-					if (MyApp.isFrontRecording) {
-						lockOrUnlockFrontVideo();
-					} else {
-						HintUtil.showToast(MainActivity.this, getResources()
-								.getString(R.string.hint_not_record_front));
-					}
-				}
-				break;
-
 			case R.id.imageBackLock:
 			case R.id.textBackLock:
 				if (!ClickUtil.isQuickClick(500)) {
-					if (MyApp.isBackRecording) {
-						lockOrUnlockBackVideo();
+					if (MyApp.isFrontRecording) {
+						lockOrUnlockVideo();
 					} else {
 						HintUtil.showToast(MainActivity.this, getResources()
-								.getString(R.string.hint_not_record_back));
+								.getString(R.string.hint_not_record));
 					}
 				}
 				break;
@@ -1625,7 +1573,7 @@ public class MainActivity extends Activity {
 						}
 					}
 					editor.commit();
-					setupFrontViews();
+					setupRecordViews();
 				}
 				break;
 
@@ -1645,7 +1593,7 @@ public class MainActivity extends Activity {
 						editor.putBoolean("videoMute", true);
 						editor.commit();
 					}
-					setupFrontViews();
+					setupRecordViews();
 					if (MyApp.shouldVideoRecordWhenChangeMute) { // 修改录音/静音后按需还原录像状态
 						MyApp.shouldVideoRecordWhenChangeMute = false;
 						new Thread(new StartRecordWhenChangeMuteThread())
@@ -1712,31 +1660,19 @@ public class MainActivity extends Activity {
 	}
 
 	/** 加锁或解锁视频 */
-	private void lockOrUnlockFrontVideo() {
+	private void lockOrUnlockVideo() {
 		if (!MyApp.isFrontLock) {
 			MyApp.isFrontLock = true;
-			speakVoice(getResources().getString(R.string.hint_video_lock_front));
+			MyApp.isBackLock = true;
+			speakVoice(getResources().getString(R.string.hint_video_lock));
 		} else {
 			MyApp.isFrontLock = false;
-			MyApp.isFrontLockSecond = false;
-			speakVoice(getResources().getString(
-					R.string.hint_video_unlock_front));
-		}
-		setupFrontViews();
-	}
-
-	/** 加锁或解锁视频 */
-	private void lockOrUnlockBackVideo() {
-		if (!MyApp.isBackLock) {
-			MyApp.isBackLock = true;
-			speakVoice(getResources().getString(R.string.hint_video_lock_back));
-		} else {
 			MyApp.isBackLock = false;
+			MyApp.isFrontLockSecond = false;
 			MyApp.isBackLockSecond = false;
-			speakVoice(getResources()
-					.getString(R.string.hint_video_unlock_back));
+			speakVoice(getResources().getString(R.string.hint_video_unlock));
 		}
-		setupBackViews();
+		setupRecordViews();
 	}
 
 	/** 视频SD卡不存在提示 */
@@ -1795,7 +1731,7 @@ public class MainActivity extends Activity {
 			mMainHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					setupFrontViews();
+					setupRecordViews();
 				}
 			});
 			if (MyApp.shouldVideoRecordWhenChangeSize) { // 修改分辨率后按需启动录像
@@ -2068,7 +2004,7 @@ public class MainActivity extends Activity {
 	}
 
 	/** 绘制录像按钮 */
-	private void setupFrontViews() {
+	private void setupRecordViews() {
 		// 视频分辨率
 		if (MyApp.resolutionState == 720) {
 			imageVideoSize.setImageDrawable(getResources().getDrawable(
@@ -2109,6 +2045,12 @@ public class MainActivity extends Activity {
 		textFrontLock.setText(getResources().getString(
 				MyApp.isFrontLock ? R.string.icon_hint_lock
 						: R.string.icon_hint_unlock));
+		imageBackLock.setImageDrawable(getResources().getDrawable(
+				MyApp.isFrontLock ? R.drawable.video_lock
+						: R.drawable.video_unlock, null));
+		textBackLock.setText(getResources().getString(
+				MyApp.isFrontLock ? R.string.icon_hint_lock
+						: R.string.icon_hint_unlock));
 		// 静音按钮
 		boolean videoMute = sharedPreferences.getBoolean("videoMute",
 				Constant.Record.muteDefault);
@@ -2121,20 +2063,6 @@ public class MainActivity extends Activity {
 				.getString(
 						videoMute ? R.string.icon_hint_mute
 								: R.string.icon_hint_unmute));
-	}
-
-	private void setupBackViews() {
-		// 录像按钮
-		// imageBackState.setImageDrawable(getResources().getDrawable(
-		// MyApp.isBackRecording ? R.drawable.video_stop
-		// : R.drawable.video_start, null));
-		// 视频加锁
-		imageBackLock.setImageDrawable(getResources().getDrawable(
-				MyApp.isBackLock ? R.drawable.video_lock
-						: R.drawable.video_unlock, null));
-		textBackLock.setText(getResources().getString(
-				MyApp.isBackLock ? R.string.icon_hint_lock
-						: R.string.icon_hint_unlock));
 	}
 
 	/** 启动录像 */
@@ -2156,7 +2084,7 @@ public class MainActivity extends Activity {
 			} else {
 				MyLog.v("Front.startRecord.Already record yet");
 			}
-			setupFrontViews();
+			setupRecordViews();
 			MyLog.v("MyApp.isFrontReording:" + MyApp.isFrontRecording);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2175,7 +2103,7 @@ public class MainActivity extends Activity {
 				} else {
 					startBackRecord();
 				}
-				setupBackViews();
+				setupRecordViews();
 			}
 			MyLog.v("MyApp.isBackReording:" + MyApp.isBackRecording);
 		} catch (Exception e) {
@@ -2350,7 +2278,7 @@ public class MainActivity extends Activity {
 				textFrontTime.setVisibility(View.VISIBLE);
 				textBackTime.setVisibility(View.VISIBLE);
 				startUpdateFrontTimeThread();
-				setupFrontViews();
+				setupRecordViews();
 			}
 		} else {
 			if (MyApp.isFrontRecording) {
@@ -2359,7 +2287,7 @@ public class MainActivity extends Activity {
 				textBackTime.setVisibility(View.INVISIBLE);
 				resetFrontTimeText();
 				MyApp.isUpdateFrontTimeRun = false;
-				setupFrontViews();
+				setupRecordViews();
 			}
 		}
 	}
@@ -2371,12 +2299,12 @@ public class MainActivity extends Activity {
 		if (isVideoRecord) {
 			if (!MyApp.isBackRecording) {
 				MyApp.isBackRecording = true;
-				setupBackViews();
+				setupRecordViews();
 			}
 		} else {
 			if (MyApp.isBackRecording) {
 				MyApp.isBackRecording = false;
-				setupBackViews();
+				setupRecordViews();
 			}
 		}
 	}
@@ -2571,10 +2499,8 @@ public class MainActivity extends Activity {
 			case 4:
 				this.removeMessages(4);
 				MyApp.isFrontCrashed = false;
-				setupFrontViews();
-
 				MyApp.isBackCrashed = false;
-				setupBackViews();
+				setupRecordViews();
 
 				// 碰撞后判断是否需要加锁第二段视频
 				if (intervalState == 5) {
@@ -2987,10 +2913,10 @@ public class MainActivity extends Activity {
 		recorderFront.setMediaFilenameFixs(
 				TachographCallback.FILE_TYPE_SHARE_VIDEO, "", "");
 		recorderFront.setMediaFilenameFixs(TachographCallback.FILE_TYPE_IMAGE,
-				"", "");
+				"", "_0");
 		// 路径
 		recorderFront.setMediaFileDirectory(TachographCallback.FILE_TYPE_VIDEO,
-				"VideoFront");
+				"VideoFront/Unlock");
 		recorderFront.setMediaFileDirectory(
 				TachographCallback.FILE_TYPE_SHARE_VIDEO, "Share");
 		recorderFront.setMediaFileDirectory(TachographCallback.FILE_TYPE_IMAGE,
@@ -3097,10 +3023,10 @@ public class MainActivity extends Activity {
 			recorderBack.setMediaFilenameFixs(
 					TachographCallback.FILE_TYPE_SHARE_VIDEO, "", "");
 			recorderBack.setMediaFilenameFixs(
-					TachographCallback.FILE_TYPE_IMAGE, "", "");
+					TachographCallback.FILE_TYPE_IMAGE, "", "_1");
 			// 路径
 			recorderBack.setMediaFileDirectory(
-					TachographCallback.FILE_TYPE_VIDEO, "VideoBack");
+					TachographCallback.FILE_TYPE_VIDEO, "VideoBack/Unlock");
 			recorderBack.setMediaFileDirectory(
 					TachographCallback.FILE_TYPE_SHARE_VIDEO, "Share");
 			recorderBack.setMediaFileDirectory(
@@ -3202,8 +3128,8 @@ public class MainActivity extends Activity {
 		 *            0-图片 1-视频
 		 * 
 		 * @param path
-		 *            视频：/storage/sdcard1/DrivingRecord/VideoFront/2016-05-
-		 *            04_155010_0.mp4
+		 *            视频：/storage/sdcard1/DrivingRecord/VideoFront/Unlock/2016-
+		 *            05- 04_155010_0.mp4
 		 *            图片:/storage/sdcard1/DrivingRecord/Image/2015-
 		 *            07-01_105536.jpg
 		 */
@@ -3212,7 +3138,7 @@ public class MainActivity extends Activity {
 			try {
 				if (type == 1) { // 视频
 					new Thread(new ReleaseFrontStorageThread()).start();
-					String videoName = path.split("/")[5];
+					String videoName = path.split("/")[6];
 
 					if (MyApp.isFrontLock) {
 						MyApp.isFrontLock = false; // 还原
@@ -3224,7 +3150,7 @@ public class MainActivity extends Activity {
 						}
 					}
 
-					setupFrontViews(); // 更新录制按钮状态
+					setupRecordViews(); // 更新录制按钮状态
 
 					StartCheckErrorFileThread(); // 执行onFileSave时，此file已经不隐藏，下个正在录的为隐藏
 				} else { // 图片
@@ -3309,12 +3235,9 @@ public class MainActivity extends Activity {
 				if (type == 1) { // 视频
 					new Thread(new ReleaseBackStorageThread()).start();
 
-					String videoName = path.split("/")[5];
-					int videoResolution = 640;
-					int videoLock = 0;
+					String videoName = path.split("/")[6];
 
 					if (MyApp.isBackLock) {
-						videoLock = 1;
 						MyApp.isBackLock = false; // 还原
 						StorageUtil.lockVideo(false, videoName);
 
@@ -3323,7 +3246,7 @@ public class MainActivity extends Activity {
 							MyApp.isBackLockSecond = false; // 不录像时修正加锁图标
 						}
 					}
-					setupBackViews(); // 更新录制按钮状态
+					setupRecordViews(); // 更新录制按钮状态
 
 					StartCheckErrorFileThread(); // 执行onFileSave时，此file已经不隐藏，下个正在录的为隐藏
 				} else { // 图片

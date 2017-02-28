@@ -67,9 +67,9 @@ public class FileUtil {
 		float sdFree = StorageUtil
 				.getSDAvailableSize(Constant.Path.RECORD_SDCARD); // SD剩余空间
 		float frontUse = (float) FileUtil.getTotalSizeOfFilesInDir(new File(
-				Constant.Path.VIDEO_FRONT_SD)); // 前置已用空间
+				Constant.Path.VIDEO_FRONT_TOTAL)); // 前置已用空间
 		float backUse = (float) FileUtil.getTotalSizeOfFilesInDir(new File(
-				Constant.Path.VIDEO_BACK_SD)); // 后置已用空间
+				Constant.Path.VIDEO_BACK_TOTAL)); // 后置已用空间
 
 		float recordTotal = sdFree + frontUse + backUse; // 录像可用空间
 		float frontTotal = recordTotal
@@ -88,7 +88,7 @@ public class FileUtil {
 		float sdTotal = StorageUtil.getSDTotalSize(Constant.Path.RECORD_SDCARD); // SD卡总空间
 		float frontLockUse = (float) FileUtil
 				.getTotalSizeOfFilesInDir(new File(
-						Constant.Path.VIDEO_FRONT_SD_LOCK)); // 前置加锁已用空间
+						Constant.Path.VIDEO_FRONT_LOCK)); // 前置加锁已用空间
 		long intFrontLockUse = (long) frontLockUse;
 		long intFrontLockMax = (long) (sdTotal * Constant.Record.FRONT_LOCK_MAX_PERCENT);
 
@@ -98,46 +98,15 @@ public class FileUtil {
 		return isFrontLockLess;
 	}
 
-	public static void showFlashCleanDialog(final Context context) {
-		FlashCleanDialog.Builder builder = new FlashCleanDialog.Builder(
-				context.getApplicationContext());
-		builder.setMessage(context.getResources().getString(
-				R.string.dialog_flash_clean_content));
-		builder.setTitle(context.getResources().getString(
-				R.string.dialog_flash_clean_title));
-		builder.setPositiveButton("确认", new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				ComponentName componentFileMtk = new ComponentName(
-						"com.mediatek.filemanager",
-						"com.mediatek.filemanager.FileManagerOperationActivity");
-				Intent intentFileMtk = new Intent();
-				intentFileMtk.setComponent(componentFileMtk);
-				intentFileMtk.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-						| Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-				context.startActivity(intentFileMtk);
-			}
-		});
-
-		FlashCleanDialog flashCleanDialog = builder.create();
-		flashCleanDialog.getWindow().setType(
-				WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-		flashCleanDialog.setCanceledOnTouchOutside(false);
-		if (!flashCleanDialog.isShowing()) {
-			flashCleanDialog.show();
-		}
-	}
-
 	public static boolean isBackStorageLess() {
 		// float sdTotal =
 		// StorageUtil.getSDTotalSize(Constant.Path.RECORD_SDCARD); // SD卡总空间
 		float sdFree = StorageUtil
 				.getSDAvailableSize(Constant.Path.RECORD_SDCARD); // SD剩余空间
 		float frontUse = (float) FileUtil.getTotalSizeOfFilesInDir(new File(
-				Constant.Path.VIDEO_FRONT_SD)); // 前置已用空间
+				Constant.Path.VIDEO_FRONT_TOTAL)); // 前置已用空间
 		float backUse = (float) FileUtil.getTotalSizeOfFilesInDir(new File(
-				Constant.Path.VIDEO_BACK_SD)); // 后置已用空间
+				Constant.Path.VIDEO_BACK_TOTAL)); // 后置已用空间
 
 		float recordTotal = sdFree + frontUse + backUse; // 录像可用空间
 		float backTotal = recordTotal
@@ -155,7 +124,7 @@ public class FileUtil {
 	public static boolean isBackLockLess() {
 		float sdTotal = StorageUtil.getSDTotalSize(Constant.Path.RECORD_SDCARD); // SD卡总空间
 		float backLockUse = (float) FileUtil.getTotalSizeOfFilesInDir(new File(
-				Constant.Path.VIDEO_BACK_SD_LOCK)); // 前置加锁已用空间
+				Constant.Path.VIDEO_BACK_LOCK)); // 后置加锁已用空间
 		long intBackLockUse = (long) backLockUse;
 		long intBackLockMax = (long) (sdTotal * Constant.Record.BACK_LOCK_MAX_PERCENT);
 
@@ -163,161 +132,6 @@ public class FileUtil {
 		MyLog.v("FileUtil.isBackLockLess:" + isBackLockLess + ",USE:"
 				+ intBackLockUse + ",MAX:" + intBackLockMax);
 		return isBackLockLess;
-	}
-
-	// ****************************************Below is OLD
-
-	public static final int SIZETYPE_B = 1; // 获取文件大小单位为B的double值
-	public static final int SIZETYPE_KB = 2; // 获取文件大小单位为KB的double值
-	public static final int SIZETYPE_MB = 3; // 获取文件大小单位为MB的double值
-	public static final int SIZETYPE_GB = 4; // 获取文件大小单位为GB的double值
-
-	public FileUtil() {
-	}
-
-	/**
-	 * 获取文件指定文件的指定单位的大小
-	 * 
-	 * @param filePath
-	 *            文件路径
-	 * @param sizeType
-	 *            获取大小的类型1为B、2为KB、3为MB、4为GB
-	 * @return double值的大小
-	 */
-	public static double getFileOrFilesSize(String filePath, int sizeType) {
-		File file = new File(filePath);
-		long blockSize = 0;
-		try {
-			if (file.isDirectory()) {
-				blockSize = getFileSizes(file);
-			} else {
-				blockSize = getFileSize(file);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			MyLog.e("FileUtil.getFileOrFilesSize:FAIL");
-		}
-		return FormetFileSize(blockSize, sizeType);
-	}
-
-	/**
-	 * 调用此方法自动计算指定文件或指定文件夹的大小
-	 * 
-	 * @param filePath
-	 *            文件路径
-	 * @return 计算好的带B、KB、MB、GB的字符串
-	 */
-	public static String getAutoFileOrFilesSize(String filePath) {
-		File file = new File(filePath);
-		long blockSize = 0;
-		try {
-			if (file.isDirectory()) {
-				blockSize = getFileSizes(file);
-			} else {
-				blockSize = getFileSize(file);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			MyLog.e("FileUtil.getAutoFileOrFilesSize:FAIL");
-		}
-		return FormetFileSize(blockSize);
-	}
-
-	/**
-	 * 获取指定文件大小
-	 * 
-	 * @param f
-	 * @return
-	 * @throws Exception
-	 */
-	private static long getFileSize(File file) throws Exception {
-		long size = 0;
-		if (file.exists()) {
-			FileInputStream fis = null;
-			fis = new FileInputStream(file);
-			size = fis.available();
-			fis.close();
-		} else {
-			file.createNewFile();
-			MyLog.e("FileUtil.getFileSize:FAIL");
-
-		}
-		return size;
-	}
-
-	/**
-	 * 获取指定文件夹
-	 * 
-	 * @param f
-	 * @return
-	 * @throws Exception
-	 */
-	private static long getFileSizes(File f) throws Exception {
-		long size = 0;
-		File flist[] = f.listFiles();
-		for (int i = 0; i < flist.length; i++) {
-			if (flist[i].isDirectory()) {
-				size = size + getFileSizes(flist[i]);
-			} else {
-				size = size + getFileSize(flist[i]);
-			}
-		}
-		return size;
-	}
-
-	/**
-	 * 转换文件大小
-	 * 
-	 * @param fileS
-	 * @return
-	 */
-	private static String FormetFileSize(long fileS) {
-		DecimalFormat df = new DecimalFormat("#.00");
-		String fileSizeString = "";
-		String wrongSize = "0B";
-		if (fileS == 0) {
-			return wrongSize;
-		}
-		if (fileS < 1024) {
-			fileSizeString = df.format((double) fileS) + "B";
-		} else if (fileS < 1048576) {
-			fileSizeString = df.format((double) fileS / 1024) + "KB";
-		} else if (fileS < 1073741824) {
-			fileSizeString = df.format((double) fileS / 1048576) + "MB";
-		} else {
-			fileSizeString = df.format((double) fileS / 1073741824) + "GB";
-		}
-		return fileSizeString;
-	}
-
-	/**
-	 * 转换文件大小,指定转换的类型
-	 * 
-	 * @param fileS
-	 * @param sizeType
-	 * @return
-	 */
-	private static double FormetFileSize(long fileS, int sizeType) {
-		DecimalFormat df = new DecimalFormat("#.00");
-		double fileSizeLong = 0;
-		switch (sizeType) {
-		case SIZETYPE_B:
-			fileSizeLong = Double.valueOf(df.format((double) fileS));
-			break;
-		case SIZETYPE_KB:
-			fileSizeLong = Double.valueOf(df.format((double) fileS / 1024));
-			break;
-		case SIZETYPE_MB:
-			fileSizeLong = Double.valueOf(df.format((double) fileS / 1048576));
-			break;
-		case SIZETYPE_GB:
-			fileSizeLong = Double.valueOf(df
-					.format((double) fileS / 1073741824));
-			break;
-		default:
-			break;
-		}
-		return fileSizeLong;
 	}
 
 }

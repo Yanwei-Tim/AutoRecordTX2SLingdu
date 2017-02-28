@@ -291,16 +291,15 @@ public interface Constant {
 		/** 录像存储卡路径 */
 		public static String RECORD_SDCARD = SDCARD_1 + File.separator;
 
-		public static String VIDEO_FRONT_FLASH = "/storage/sdcard0/DrivingRecord/VideoFront/";
-		public static String VIDEO_FRONT_SD = "/storage/sdcard1/DrivingRecord/VideoFront/";
-		public static String VIDEO_FRONT_SD_LOCK = "/storage/sdcard1/DrivingRecord/VideoFront/Lock";
+		public static String VIDEO_FRONT_TOTAL = "/storage/sdcard1/DrivingRecord/VideoFront/";
+		public static String VIDEO_FRONT_UNLOCK = "/storage/sdcard1/DrivingRecord/VideoFront/Unlock";
+		public static String VIDEO_FRONT_LOCK = "/storage/sdcard1/DrivingRecord/VideoFront/Lock";
 
-		public static String VIDEO_BACK_FLASH = "/storage/sdcard0/DrivingRecord/VideoBack/";
-		public static String VIDEO_BACK_SD = "/storage/sdcard1/DrivingRecord/VideoBack/";
-		public static String VIDEO_BACK_SD_LOCK = "/storage/sdcard1/DrivingRecord/VideoBack/Lock";
+		public static String VIDEO_BACK_TOTAL = "/storage/sdcard1/DrivingRecord/VideoBack/";
+		public static String VIDEO_BACK_UNLOCK = "/storage/sdcard1/DrivingRecord/VideoBack/Unock";
+		public static String VIDEO_BACK_LOCK = "/storage/sdcard1/DrivingRecord/VideoBack/Lock";
 
-		public static String IMAGE_FLASH = "/storage/sdcard0/DrivingRecord/Image/";
-		public static String IMAGE_SD = "/storage/sdcard1/DrivingRecord/Image/";
+		public static String IMAGE_BOTH = "/storage/sdcard1/DrivingRecord/Image/";
 
 		public static String RECORD_DIRECTORY = "/storage/sdcard1/DrivingRecord/";
 
