@@ -185,7 +185,7 @@
                 android:layout_marginTop="@dimen/icon_area_margin_top_bottom" >
 
                 <ImageButton
-                    android:id="@+id/imageFrontLock"
+                    android:id="@+id/imageVideoLock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -195,7 +195,7 @@
                     android:src="@drawable/video_unlock" />
 
                 <TextView
-                    android:id="@+id/textFrontLock"
+                    android:id="@+id/textVideoLock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
@@ -212,7 +212,7 @@
                 android:layout_centerInParent="true" >
 
                 <ImageButton
-                    android:id="@+id/imageFrontState"
+                    android:id="@+id/imageRecordState"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
@@ -228,7 +228,7 @@
                 android:layout_marginBottom="@dimen/icon_area_margin_top_bottom" >
 
                 <ImageButton
-                    android:id="@+id/imageFrontSwitch"
+                    android:id="@+id/imageCameraSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -238,7 +238,7 @@
                     android:src="@drawable/camera_switch" />
 
                 <TextView
-                    android:id="@+id/textFrontSwitch"
+                    android:id="@+id/textCameraSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
@@ -251,7 +251,7 @@
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/textFrontTime"
+            android:id="@+id/textRecordTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"

@@ -80,12 +80,12 @@ public class MainActivity extends Activity {
 
 	// 前置
 	private RelativeLayout layoutFront;
-	private TextView textFrontTime; // 时间跑秒
-	private ImageButton imageFrontState; // 录像按钮
-	private ImageButton imageFrontLock; // 加锁按钮
-	private TextView textFrontLock;
-	private ImageButton imageFrontSwitch; // 前后切换
-	private TextView textFrontSwitch;
+	private TextView textRecordTime; // 时间跑秒
+	private ImageButton imageRecordState; // 录像按钮
+	private ImageButton imageVideoLock; // 加锁按钮
+	private TextView textVideoLock;
+	private ImageButton imageCameraSwitch; // 前后切换
+	private TextView textCameraSwitch;
 	private ImageButton imageVideoSize; // 视频尺寸
 	private TextView textVideoSize;
 	private ImageButton imageVideoLength; // 视频分段
@@ -1135,25 +1135,25 @@ public class MainActivity extends Activity {
 		layoutFront.setVisibility(View.VISIBLE);
 		initialFrontSurface(); // 前置
 
-		textFrontTime = (TextView) findViewById(R.id.textFrontTime);
-		textFrontTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
+		textRecordTime = (TextView) findViewById(R.id.textRecordTime);
+		textRecordTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
 				+ "Font-Quartz-Regular.ttf"));
 
 		// 录制
-		imageFrontState = (ImageButton) findViewById(R.id.imageFrontState);
-		imageFrontState.setOnClickListener(myOnClickListener);
+		imageRecordState = (ImageButton) findViewById(R.id.imageRecordState);
+		imageRecordState.setOnClickListener(myOnClickListener);
 
 		// 锁定
-		imageFrontLock = (ImageButton) findViewById(R.id.imageFrontLock);
-		imageFrontLock.setOnClickListener(myOnClickListener);
-		textFrontLock = (TextView) findViewById(R.id.textFrontLock);
-		textFrontLock.setOnClickListener(myOnClickListener);
+		imageVideoLock = (ImageButton) findViewById(R.id.imageVideoLock);
+		imageVideoLock.setOnClickListener(myOnClickListener);
+		textVideoLock = (TextView) findViewById(R.id.textVideoLock);
+		textVideoLock.setOnClickListener(myOnClickListener);
 
 		// 前后切换图标
-		imageFrontSwitch = (ImageButton) findViewById(R.id.imageFrontSwitch);
-		imageFrontSwitch.setOnClickListener(myOnClickListener);
-		textFrontSwitch = (TextView) findViewById(R.id.textFrontSwitch);
-		textFrontSwitch.setOnClickListener(myOnClickListener);
+		imageCameraSwitch = (ImageButton) findViewById(R.id.imageCameraSwitch);
+		imageCameraSwitch.setOnClickListener(myOnClickListener);
+		textCameraSwitch = (TextView) findViewById(R.id.textCameraSwitch);
+		textCameraSwitch.setOnClickListener(myOnClickListener);
 
 		// 拍照
 		imagePhotoTake = (ImageButton) findViewById(R.id.imagePhotoTake);
@@ -1357,11 +1357,11 @@ public class MainActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 			switch (v.getId()) {
-			case R.id.imageFrontState:
+			case R.id.imageRecordState:
 				if (!ClickUtil.isQuickClick(1000)) {
 					if (MyApp.isFrontRecording) {
 						speakVoice(getResources().getString(
-								R.string.hint_front_record_stop));
+								R.string.hint_record_stop));
 						MyLog.v("[onClick]stopRecorder()");
 						stopFrontRecorder5Times();
 					} else {
@@ -1377,7 +1377,7 @@ public class MainActivity extends Activity {
 										Name.REC_FRONT_STATE, "0");
 							}
 							speakVoice(getResources().getString(
-									R.string.hint_front_record_start));
+									R.string.hint_record_start));
 							startRecordFront();
 						} else {
 							noVideoSDHint();
@@ -1469,8 +1469,8 @@ public class MainActivity extends Activity {
 				}
 				break;
 
-			case R.id.imageFrontLock:
-			case R.id.textFrontLock:
+			case R.id.imageVideoLock:
+			case R.id.textVideoLock:
 				if (!ClickUtil.isQuickClick(500)) {
 					if (MyApp.isFrontRecording) {
 						lockOrUnlockVideo();
@@ -1487,8 +1487,8 @@ public class MainActivity extends Activity {
 					// 切换分辨率录像停止，需要重置时间
 					MyApp.shouldVideoRecordWhenChangeSize = MyApp.isFrontRecording;
 					MyApp.isFrontRecording = false;
-					resetFrontTimeText();
-					textFrontTime.setVisibility(View.INVISIBLE);
+					resetRecordTimeText();
+					textRecordTime.setVisibility(View.INVISIBLE);
 					if (MyApp.resolutionState == 1080) {
 						setFrontResolution(720);
 						editor.putString("videoSize", "720");
@@ -1568,8 +1568,8 @@ public class MainActivity extends Activity {
 				}
 				break;
 
-			case R.id.imageFrontSwitch:
-			case R.id.textFrontSwitch:
+			case R.id.imageCameraSwitch:
+			case R.id.textCameraSwitch:
 				if (Constant.Module.hasCVBSDetect && !SettingUtil.isCVBSIn()) {
 					HintUtil.showToast(context,
 							getString(R.string.no_cvbs_detect));
@@ -1647,12 +1647,20 @@ public class MainActivity extends Activity {
 		if (!MyApp.isFrontRecording && !MyApp.isBackRecording
 				&& !StorageUtil.isFrontCardExist()) { // 判断SD卡2是否存在，需要耗费一定时间
 			noVideoSDHint(); // SDCard不存在
-		} else if (recorderFront != null) {
-			setFrontDirectory(); // 设置保存路径，否则会保存到内部存储
-			HintUtil.playAudio(getApplicationContext(),
-					com.tchip.tachograph.TachographCallback.FILE_TYPE_IMAGE,
-					playSound);
-			recorderFront.takePicture();
+		} else {
+			if (recorderFront != null) {
+				setFrontDirectory(); // 设置保存路径，否则会保存到内部存储
+				HintUtil.playAudio(
+						getApplicationContext(),
+						com.tchip.tachograph.TachographCallback.FILE_TYPE_IMAGE,
+						playSound);
+				recorderFront.takePicture();
+			}
+
+			if (recorderBack != null) {
+				setFrontDirectory(); // 设置保存路径，否则会保存到内部存储
+				recorderBack.takePicture();
+			}
 		}
 	}
 
@@ -1724,13 +1732,13 @@ public class MainActivity extends Activity {
 
 							@Override
 							public void run() {
-								resetFrontTimeText();
+								resetRecordTimeText();
 								HintUtil.playAudio(
 										getApplicationContext(),
 										com.tchip.tachograph.TachographCallback.FILE_TYPE_VIDEO,
 										MyApp.isAccOn);
 
-								setFrontState(true);
+								setRecordState(true);
 							}
 						});
 					}
@@ -1771,8 +1779,8 @@ public class MainActivity extends Activity {
 	private void stopFrontRecorder5Times() {
 		if (isFrontRecord()) {
 			new Thread(new StopFrontRecordThread()).start();
-			textFrontTime.setVisibility(View.INVISIBLE);
-			resetFrontTimeText();
+			textRecordTime.setVisibility(View.INVISIBLE);
+			resetRecordTimeText();
 		}
 	}
 
@@ -1802,7 +1810,7 @@ public class MainActivity extends Activity {
 
 						@Override
 						public void run() {
-							setFrontState(false);
+							setRecordState(false);
 						}
 					});
 				}
@@ -1973,7 +1981,7 @@ public class MainActivity extends Activity {
 					R.string.icon_hint_1080p));
 		}
 		// 录像按钮
-		imageFrontState.setImageDrawable(getResources().getDrawable(
+		imageRecordState.setImageDrawable(getResources().getDrawable(
 				MyApp.isFrontRecording ? R.drawable.video_stop
 						: R.drawable.video_start, null));
 		// 视频分段
@@ -1994,10 +2002,10 @@ public class MainActivity extends Activity {
 					R.string.icon_hint_3_minutes));
 		}
 		// 视频加锁
-		imageFrontLock.setImageDrawable(getResources().getDrawable(
+		imageVideoLock.setImageDrawable(getResources().getDrawable(
 				MyApp.isFrontLock ? R.drawable.video_lock
 						: R.drawable.video_unlock, null));
-		textFrontLock.setText(getResources().getString(
+		textVideoLock.setText(getResources().getString(
 				MyApp.isFrontLock ? R.string.icon_hint_lock
 						: R.string.icon_hint_unlock));
 		// 静音按钮
@@ -2218,22 +2226,22 @@ public class MainActivity extends Activity {
 	}
 
 	/** 设置当前录像状态 */
-	private void setFrontState(boolean isVideoRecord) {
+	private void setRecordState(boolean isVideoRecord) {
 		ProviderUtil.setValue(context, Name.REC_FRONT_STATE,
 				isVideoRecord ? "1" : "0");
 		if (isVideoRecord) {
 			if (!MyApp.isFrontRecording) {
 				MyApp.isFrontRecording = true;
-				textFrontTime.setVisibility(View.VISIBLE);
-				startUpdateFrontTimeThread();
+				textRecordTime.setVisibility(View.VISIBLE);
+				startUpdateRecordTimeThread();
 				setupRecordViews();
 			}
 		} else {
 			if (MyApp.isFrontRecording) {
 				MyApp.isFrontRecording = false;
-				textFrontTime.setVisibility(View.INVISIBLE);
-				resetFrontTimeText();
-				MyApp.isUpdateFrontTimeRun = false;
+				textRecordTime.setVisibility(View.INVISIBLE);
+				resetRecordTimeText();
+				MyApp.isRecordTimeUpdating = false;
 				setupRecordViews();
 			}
 		}
@@ -2256,7 +2264,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private int secondFrontCount = -1;
+	private int recordTimeCount = -1;
 
 	/**
 	 * 录制时间秒钟复位:
@@ -2272,71 +2280,71 @@ public class MainActivity extends Activity {
 	 * 5.开始录像{@link #startRecordTask()}
 	 * 
 	 */
-	private void resetFrontTimeText() {
-		secondFrontCount = -1;
-		textFrontTime.setText("00 : 00");
+	private void resetRecordTimeText() {
+		recordTimeCount = -1;
+		textRecordTime.setText("00 : 00");
 	}
 
 	/** 开启录像跑秒线程 */
-	private void startUpdateFrontTimeThread() {
-		if (!MyApp.isUpdateFrontTimeRun) {
-			new Thread(new UpdateFrontTimeThread()).start(); // 更新录制时间
+	private void startUpdateRecordTimeThread() {
+		if (!MyApp.isRecordTimeUpdating) {
+			new Thread(new UpdateRecordTimeThread()).start(); // 更新录制时间
 		} else {
-			MyLog.e("Front.UpdateRecordTimeThread already run");
+			MyLog.e("UpdateRecordTimeThread already run");
 		}
 	}
 
-	public class UpdateFrontTimeThread implements Runnable {
+	public class UpdateRecordTimeThread implements Runnable {
 
 		@Override
 		public void run() {
 			// 解决录像时，快速点击录像按钮两次，线程叠加跑秒过快的问题
 			do {
-				MyApp.isUpdateFrontTimeRun = true;
+				MyApp.isRecordTimeUpdating = true;
 				if (MyApp.isFrontCrashed) {
 					Message messageVideoLock = new Message();
 					messageVideoLock.what = 4;
-					updateFrontTimeHandler.sendMessage(messageVideoLock);
+					updateRecordTimeHandler.sendMessage(messageVideoLock);
 				}
 				if (MyApp.isAppException) { // 程序异常,停止录像
 					MyApp.isAppException = false;
 					MyLog.e("Front.App exception, stop record!");
 					Message messageException = new Message();
 					messageException.what = 8;
-					updateFrontTimeHandler.sendMessage(messageException);
+					updateRecordTimeHandler.sendMessage(messageException);
 					return;
 				} else if (MyApp.isVideoCardEject) { // 录像时视频SD卡拔出停止录像
 					MyLog.e("Front.SD card remove badly or power unconnected, stop record!");
 					Message messageEject = new Message();
 					messageEject.what = 2;
-					updateFrontTimeHandler.sendMessage(messageEject);
+					updateRecordTimeHandler.sendMessage(messageEject);
 					return;
 				} else if (MyApp.isVideoCardFormat) { // 录像SD卡格式化
 					MyApp.isVideoCardFormat = false;
 					MyLog.e("Front.SD card is format, stop record!");
 					Message messageFormat = new Message();
 					messageFormat.what = 7;
-					updateFrontTimeHandler.sendMessage(messageFormat);
+					updateRecordTimeHandler.sendMessage(messageFormat);
 					return;
 				} else if (MyApp.isGoingShutdown) {
 					MyApp.isGoingShutdown = false;
 					MyLog.e("Front.Going shutdown, stop record!");
 					Message messageFormat = new Message();
 					messageFormat.what = 9;
-					updateFrontTimeHandler.sendMessage(messageFormat);
+					updateRecordTimeHandler.sendMessage(messageFormat);
 					return;
 				} else if (MyApp.shouldStopFrontFromVoice) {
 					MyApp.shouldStopFrontFromVoice = false;
 					Message messageStopRecordFromVoice = new Message();
 					messageStopRecordFromVoice.what = 6;
-					updateFrontTimeHandler
+					updateRecordTimeHandler
 							.sendMessage(messageStopRecordFromVoice);
 					return;
 				} else if (!MyApp.isAccOn && !MyApp.isParkRecording) { // ACC下电停止录像
 					MyLog.e("Front.Stop Record:isSleeping = true");
 					Message messageSleep = new Message();
 					messageSleep.what = 5;
-					updateFrontTimeHandler.sendMessage(messageSleep);
+					updateRecordTimeHandler.sendMessage(messageSleep);
 					return;
 				} else {
 					try {
@@ -2346,24 +2354,24 @@ public class MainActivity extends Activity {
 					}
 					Message messageSecond = new Message();
 					messageSecond.what = 1;
-					updateFrontTimeHandler.sendMessage(messageSecond);
+					updateRecordTimeHandler.sendMessage(messageSecond);
 				}
 			} while (MyApp.isFrontRecording);
-			MyApp.isUpdateFrontTimeRun = false;
+			MyApp.isRecordTimeUpdating = false;
 		}
 
 	}
 
-	final Handler updateFrontTimeHandler = new Handler() {
+	final Handler updateRecordTimeHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case 1:
 				this.removeMessages(1);
 				if (!ClickUtil.isPlusFrontTimeTooQuick(900)) {
-					secondFrontCount++;
-					if (MyApp.isFrontRecording && secondFrontCount % 10 == 0) {
+					recordTimeCount++;
+					if (MyApp.isFrontRecording && recordTimeCount % 10 == 0) {
 						acquirePartialWakeLock(10 * 1000);
-						if (secondFrontCount % 30 == 0) {
+						if (recordTimeCount % 30 == 0) {
 							ProviderUtil.setValue(context,
 									Name.REC_FRONT_STATE, "1");
 							if (MyApp.isBackRecording) {
@@ -2377,7 +2385,7 @@ public class MainActivity extends Activity {
 				if (!MyApp.isAccOn) { // 处理停车守卫录像
 					if (MyApp.isParkRecording) {
 						if (MyApp.isFrontRecording
-								&& secondFrontCount == Constant.Record.parkVideoLength) {
+								&& recordTimeCount == Constant.Record.parkVideoLength) {
 							MyLog.v("Front.updateFrontTimeHandler.Stop Park Record");
 							stopFrontRecorder5Times(); // 停止录像
 							stopBackRecorder5Times();
@@ -2407,26 +2415,26 @@ public class MainActivity extends Activity {
 				switch (intervalState) { // 重置时间
 
 				case 5:
-					if (secondFrontCount >= 300) {
-						secondFrontCount = 0;
+					if (recordTimeCount >= 300) {
+						recordTimeCount = 0;
 					}
 					break;
 
 				case 3:
-					if (secondFrontCount >= 180) {
-						secondFrontCount = 0;
+					if (recordTimeCount >= 180) {
+						recordTimeCount = 0;
 					}
 					break;
 
 				case 1:
 				default:
-					if (secondFrontCount >= 60) {
-						secondFrontCount = 0;
+					if (recordTimeCount >= 60) {
+						recordTimeCount = 0;
 					}
 					break;
 				}
-				textFrontTime.setText(DateUtil
-						.getFormatTimeBySecond(secondFrontCount));
+				textRecordTime.setText(DateUtil
+						.getFormatTimeBySecond(recordTimeCount));
 
 				this.removeMessages(1);
 				break;
@@ -2448,17 +2456,17 @@ public class MainActivity extends Activity {
 
 				// 碰撞后判断是否需要加锁第二段视频
 				if (intervalState == 5) {
-					if (secondFrontCount > 295) {
+					if (recordTimeCount > 295) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
 				} else if (intervalState == 1) { // 1
-					if (secondFrontCount > 55) {
+					if (recordTimeCount > 55) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
 				} else { // 3
-					if (secondFrontCount > 175) {
+					if (recordTimeCount > 175) {
 						MyApp.isFrontLockSecond = true;
 						MyApp.isBackLockSecond = true;
 					}
@@ -2482,7 +2490,7 @@ public class MainActivity extends Activity {
 				this.removeMessages(6);
 				break;
 
-			case 7:
+			case 7: // 格式化存储卡，停止录像
 				this.removeMessages(7);
 				MyLog.v("Front.UpdateRecordTimeHandler.stopRecorder() 7");
 				stopFrontRecorder5Times();
@@ -2549,7 +2557,7 @@ public class MainActivity extends Activity {
 					mMainHandler.post(new Runnable() {
 						@Override
 						public void run() {
-							setFrontState(false);
+							setRecordState(false);
 						}
 					});
 					try {
@@ -2575,12 +2583,12 @@ public class MainActivity extends Activity {
 
 								@Override
 								public void run() {
-									resetFrontTimeText();
+									resetRecordTimeText();
 									HintUtil.playAudio(
 											getApplicationContext(),
 											com.tchip.tachograph.TachographCallback.FILE_TYPE_VIDEO,
 											MyApp.isAccOn);
-									setFrontState(true);
+									setRecordState(true);
 								}
 							});
 						}
