@@ -265,6 +265,20 @@
             android:textSize="@dimen/record_time_text_size"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/textLatLng"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:shadowColor="#000000"
+            android:shadowDx="1.5"
+            android:shadowDy="1.5"
+            android:shadowRadius="2.5"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+
         <ImageButton
             android:id="@+id/imagePhotoTake"
             android:layout_width="wrap_content"

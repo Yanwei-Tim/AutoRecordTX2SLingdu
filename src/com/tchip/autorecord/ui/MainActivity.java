@@ -78,6 +78,7 @@ public class MainActivity extends Activity {
 	private WakeLock partialWakeLock;
 	private WakeLock fullWakeLock;
 
+	private TextView textLatLng; // 经纬度
 	// 前置
 	private RelativeLayout layoutFront;
 	private TextView textRecordTime; // 时间跑秒
@@ -396,11 +397,16 @@ public class MainActivity extends Activity {
 						recorderFront.setSpeed(recordSpeed);
 						recordSpeed = 0; // 清除速度
 					}
-					recorderFront.setLat(new DecimalFormat("#.00000")
+					recorderFront.setLat(new DecimalFormat("#.000000")
 							.format(nowLatitude) + "");
-					recorderFront.setLong(new DecimalFormat("#.00000")
+					recorderFront.setLong(new DecimalFormat("#.000000")
 							.format(nowLongitude) + "");
 				}
+
+				textLatLng.setText("LAT:"
+						+ new DecimalFormat("#.000000").format(nowLatitude)
+						+ "   LNG:"
+						+ new DecimalFormat("#.000000").format(nowLongitude));
 			}
 		} catch (Exception e) {
 			MyLog.e("GPS", "updateSpeedByLocation catch:" + e.toString());
@@ -887,7 +893,7 @@ public class MainActivity extends Activity {
 					}
 				}
 
-				if (shouldRecordBack() && !isBackRecord()) {
+				if (!isBackRecord()) {
 					Message message = new Message();
 					message.what = 2;
 					autoHandler.sendMessage(message);
@@ -897,11 +903,6 @@ public class MainActivity extends Activity {
 				MyLog.e("AutoThread: Catch Exception!");
 			}
 		}
-	}
-
-	/** 是否开启后录 */
-	private boolean shouldRecordBack() {
-		return Constant.Record.autoRecordBack;
 	}
 
 	final Handler autoHandler = new Handler() {
@@ -1014,7 +1015,7 @@ public class MainActivity extends Activity {
 					MyApp.shouldMountRecordFront = false;
 					if (MyApp.isAccOn && !isFrontRecord()) {
 						if (!StorageUtil.isFrontCardExist()) {
-							noVideoSDHint();
+							// noVideoSDHint();
 						} else {
 							new Thread(new RecordFrontWhenMountThread())
 									.start();
@@ -1023,7 +1024,7 @@ public class MainActivity extends Activity {
 				}
 				if (MyApp.shouldMountRecordBack) {
 					MyApp.shouldMountRecordBack = false;
-					if (MyApp.isAccOn && shouldRecordBack() && !isBackRecord()) {
+					if (MyApp.isAccOn && !isBackRecord()) {
 						new Thread(new RecordBackWhenMountThread()).start();
 					}
 				}
@@ -1134,6 +1135,10 @@ public class MainActivity extends Activity {
 		layoutFront = (RelativeLayout) findViewById(R.id.layoutFront);
 		layoutFront.setVisibility(View.VISIBLE);
 		initialFrontSurface(); // 前置
+
+		textLatLng = (TextView) findViewById(R.id.textLatLng);
+		textLatLng.setTypeface(Typefaces.get(this, Constant.Path.FONT
+				+ "Font-Helvetica-Neue-LT-Pro.otf"));
 
 		textRecordTime = (TextView) findViewById(R.id.textRecordTime);
 		textRecordTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
@@ -1384,88 +1389,31 @@ public class MainActivity extends Activity {
 						}
 					}
 
-					if (shouldRecordBack()) { // 后录功能开启
-						if (MyApp.isBackRecording) {
-							MyLog.v("[onClick]stopRecorder()");
-							// stopBackRecorder5Times();
-							if (stopBackRecorder() == 0) {
-								setBackState(false);
-							}
-							editor.putBoolean(
-									Constant.MySP.STR_SHOULD_RECORD_BACK, false);
-							editor.commit();
-						} else {
-							if (!MyApp.isAccOn) {
-								HintUtil.showToast(
-										context,
-										getResources()
-												.getString(
-														R.string.hint_stop_record_sleeping));
-							} else if (StorageUtil.isBackCardExist()) {
-								if (isBackRecord()) {
-									recorderBack.stop();
-									ProviderUtil.setValue(context,
-											Name.REC_BACK_STATE, "0");
-								}
-								startRecordBack();
-							} else {
-								noVideoSDHint();
-							}
+					if (MyApp.isBackRecording) {
+						MyLog.v("[onClick]stopRecorder()");
+						// stopBackRecorder5Times();
+						if (stopBackRecorder() == 0) {
+							setBackState(false);
 						}
-					} else { // 后录功能关闭：显示对话框
-						AlertDialog.Builder builder = new Builder(
-								MainActivity.this);
-						builder.setMessage(getResources().getString(
-								R.string.hint_enable_record_back));
-						builder.setTitle("提示");
-						builder.setPositiveButton(
-								getResources()
-										.getString(R.string.enable_cancel),
-								new android.content.DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(
-											android.content.DialogInterface dialog,
-											int which) {
-										dialog.dismiss();
-									}
-								});
-						builder.setNegativeButton(
-								getResources().getString(
-										R.string.enable_confirm),
-								new android.content.DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(
-											android.content.DialogInterface dialog,
-											int which) {
-										dialog.dismiss();
-										editor.putBoolean(
-												Constant.MySP.STR_SHOULD_RECORD_BACK,
-												true);
-										editor.commit();
-
-										if (!MyApp.isAccOn) {
-											HintUtil.showToast(
-													context,
-													getResources()
-															.getString(
-																	R.string.hint_stop_record_sleeping));
-										} else if (StorageUtil
-												.isBackCardExist()) {
-											if (isBackRecord()) {
-												recorderBack.stop();
-												ProviderUtil.setValue(context,
-														Name.REC_BACK_STATE,
-														"0");
-											}
-											startRecordBack();
-										} else {
-											noVideoSDHint();
-										}
-									}
-								});
-						builder.create().show();
+						editor.putBoolean(Constant.MySP.STR_SHOULD_RECORD_BACK,
+								false);
+						editor.commit();
+					} else {
+						if (!MyApp.isAccOn) {
+							HintUtil.showToast(
+									context,
+									getResources().getString(
+											R.string.hint_stop_record_sleeping));
+						} else if (StorageUtil.isBackCardExist()) {
+							if (isBackRecord()) {
+								recorderBack.stop();
+								ProviderUtil.setValue(context,
+										Name.REC_BACK_STATE, "0");
+							}
+							startRecordBack();
+						} else {
+						}
 					}
-
 				}
 				break;
 
@@ -1474,9 +1422,35 @@ public class MainActivity extends Activity {
 				if (!ClickUtil.isQuickClick(500)) {
 					if (MyApp.isFrontRecording) {
 						lockOrUnlockVideo();
-					} else {
-						HintUtil.showToast(MainActivity.this, getResources()
-								.getString(R.string.hint_not_record));
+					} else { // 未录像
+						if (!MyApp.isAccOn) {
+							HintUtil.showToast(
+									context,
+									getResources().getString(
+											R.string.hint_stop_record_sleeping));
+						} else if (StorageUtil.isFrontCardExist()) {
+							if (isFrontRecord()) {
+								recorderFront.stop();
+								ProviderUtil.setValue(context,
+										Name.REC_FRONT_STATE, "0");
+							}
+							speakVoice(getResources().getString(
+									R.string.hint_record_start));
+							startRecordFront();
+
+							if (isBackRecord()) {
+								recorderBack.stop();
+								ProviderUtil.setValue(context,
+										Name.REC_BACK_STATE, "0");
+							}
+							startRecordBack();
+						} else {
+							noVideoSDHint();
+						}
+
+						MyApp.isFrontLock = true;
+						MyApp.isBackLock = true;
+						setupRecordViews();
 					}
 				}
 				break;
@@ -1633,7 +1607,7 @@ public class MainActivity extends Activity {
 
 	/** 视频SD卡不存在提示 */
 	private void noVideoSDHint() {
-		if (MyApp.isAccOn && !ClickUtil.isHintSleepTooQuick(3000)) {
+		if (MyApp.isAccOn && !ClickUtil.isHintSleepTooQuick(5000)) {
 			String strNoSD = getResources().getString(
 					R.string.hint_sd_record_not_exist);
 			HintUtil.showToast(context, strNoSD);

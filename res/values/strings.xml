@@ -29,6 +29,7 @@
     <string name="hint_enable_back_in_engineer_mode">请在工程模式激活后录</string>
     <string name="hint_not_record">未录像</string>
     <string name="default_record_time">00 : 00</string>
+    <string name="default_latitude_longitude">LAT:123.123456   LNG:12.123456</string>
     <string name="short_record">REC</string>
     <string name="hint_save_video_error">视频保存失败</string>
     <string name="hint_save_photo_error">图片保存失败</string>
