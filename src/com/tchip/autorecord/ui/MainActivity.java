@@ -67,6 +67,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextClock;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -79,9 +80,10 @@ public class MainActivity extends Activity {
 	private WakeLock fullWakeLock;
 
 	private TextView textLatLng; // 经纬度
+	private TextView textPositionFront, textPositionBack;
 	// 前置
 	private RelativeLayout layoutFront;
-	private TextView textRecordTime; // 时间跑秒
+	private TextClock textRecordTime; // 时间跑秒
 	private ImageButton imageRecordState; // 录像按钮
 	private ImageButton imageVideoLock; // 加锁按钮
 	private TextView textVideoLock;
@@ -403,10 +405,10 @@ public class MainActivity extends Activity {
 							.format(nowLongitude) + "");
 				}
 
-				textLatLng.setText("LAT:"
-						+ new DecimalFormat("#.000000").format(nowLatitude)
-						+ "   LNG:"
-						+ new DecimalFormat("#.000000").format(nowLongitude));
+				textLatLng.setText("E:"
+						+ new DecimalFormat("#.000000").format(nowLongitude)
+						+ "   N:"
+						+ new DecimalFormat("#.000000").format(nowLatitude));
 			}
 		} catch (Exception e) {
 			MyLog.e("GPS", "updateSpeedByLocation catch:" + e.toString());
@@ -1130,19 +1132,20 @@ public class MainActivity extends Activity {
 	private void initialLayout() {
 		layoutBack = (RelativeLayout) findViewById(R.id.layoutBack);
 		layoutBack.setVisibility(View.GONE);
-		initialBackSurface(); // 后置
-
 		layoutFront = (RelativeLayout) findViewById(R.id.layoutFront);
 		layoutFront.setVisibility(View.VISIBLE);
-		initialFrontSurface(); // 前置
+		initialRecordSurface();
 
 		textLatLng = (TextView) findViewById(R.id.textLatLng);
 		textLatLng.setTypeface(Typefaces.get(this, Constant.Path.FONT
 				+ "Font-Helvetica-Neue-LT-Pro.otf"));
 
-		textRecordTime = (TextView) findViewById(R.id.textRecordTime);
+		textPositionFront = (TextView) findViewById(R.id.textPositionFront);
+		textPositionBack = (TextView) findViewById(R.id.textPositionBack);
+
+		textRecordTime = (TextClock) findViewById(R.id.textRecordTime);
 		textRecordTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
-				+ "Font-Quartz-Regular.ttf"));
+				+ "Font-Helvetica-Neue-LT-Pro.otf"));
 
 		// 录制
 		imageRecordState = (ImageButton) findViewById(R.id.imageRecordState);
@@ -1222,6 +1225,8 @@ public class MainActivity extends Activity {
 					1));
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
+			textPositionFront.setVisibility(View.VISIBLE);
+			textPositionBack.setVisibility(View.GONE);
 			break;
 
 		case 1: // BACK
@@ -1235,8 +1240,12 @@ public class MainActivity extends Activity {
 					Name.BACK_CAR_STATE, "0");
 			if ("1".equals(strBackState)) {
 				setBackLineVisible(true);
+				textPositionFront.setVisibility(View.GONE);
+				textPositionBack.setVisibility(View.GONE);
 			} else {
 				setBackLineVisible(false);
+				textPositionFront.setVisibility(View.GONE);
+				textPositionBack.setVisibility(View.VISIBLE);
 			}
 			break;
 
@@ -1251,6 +1260,9 @@ public class MainActivity extends Activity {
 			surfaceViewBack.setLayoutParams(backLayoutParams);
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
+
+			textPositionFront.setVisibility(View.VISIBLE);
+			textPositionBack.setVisibility(View.VISIBLE);
 		}
 			break;
 
@@ -1273,6 +1285,9 @@ public class MainActivity extends Activity {
 					1));
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
+
+			textPositionFront.setVisibility(View.VISIBLE);
+			textPositionBack.setVisibility(View.GONE);
 			break;
 
 		case 1:
@@ -1281,6 +1296,9 @@ public class MainActivity extends Activity {
 					CAMERA_WIDTH, CAMERA_HEIGHT)); // 854,480
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
+
+			textPositionFront.setVisibility(View.GONE);
+			textPositionBack.setVisibility(View.VISIBLE);
 			break;
 
 		case 2: { // FRONT + BACK
@@ -1294,6 +1312,9 @@ public class MainActivity extends Activity {
 			surfaceViewBack.setLayoutParams(backLayoutParams);
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
+
+			textPositionFront.setVisibility(View.VISIBLE);
+			textPositionBack.setVisibility(View.VISIBLE);
 		}
 			break;
 
@@ -1535,13 +1556,14 @@ public class MainActivity extends Activity {
 				}
 				break;
 
-			// case R.id.surfaceView:
 			case R.id.imagePhotoTake:
 				if (!ClickUtil.isQuickClick(1000)) {
 					takePhoto(true);
 				}
 				break;
 
+			case R.id.surfaceViewBack:
+			case R.id.surfaceViewFront:
 			case R.id.imageCameraSwitch:
 			case R.id.textCameraSwitch:
 				if (Constant.Module.hasCVBSDetect && !SettingUtil.isCVBSIn()) {
@@ -2256,7 +2278,7 @@ public class MainActivity extends Activity {
 	 */
 	private void resetRecordTimeText() {
 		recordTimeCount = -1;
-		textRecordTime.setText("00 : 00");
+		// textRecordTime.setText("00 : 00");
 	}
 
 	/** 开启录像跑秒线程 */
@@ -2407,8 +2429,8 @@ public class MainActivity extends Activity {
 					}
 					break;
 				}
-				textRecordTime.setText(DateUtil
-						.getFormatTimeBySecond(recordTimeCount));
+				// textRecordTime.setText(DateUtil
+				// .getFormatTimeBySecond(recordTimeCount));
 
 				this.removeMessages(1);
 				break;
@@ -2487,12 +2509,13 @@ public class MainActivity extends Activity {
 			case 9: // 系统关机，停止录像
 				this.removeMessages(9);
 				MyLog.v("Front.UpdateRecordTimeHandler.stopRecorder() 9");
+				// String strGoingShutdown = getResources().getString(
+				// R.string.hint_going_shutdown);
+				// HintUtil.showToast(MainActivity.this, strGoingShutdown);
+				// speakVoice(strGoingShutdown);
+
 				stopFrontRecorder5Times();
 				stopBackRecorder5Times();
-				String strGoingShutdown = getResources().getString(
-						R.string.hint_going_shutdown);
-				HintUtil.showToast(MainActivity.this, strGoingShutdown);
-				// speakVoice(strGoingShutdown);
 				this.removeMessages(9);
 				break;
 
@@ -2573,17 +2596,25 @@ public class MainActivity extends Activity {
 
 	}
 
-	private void initialFrontSurface() {
-		MyLog.v("initialFrontSurface");
+	private void initialRecordSurface() {
+		MyLog.v("initialRecordSurface");
 		surfaceViewFront = (SurfaceView) findViewById(R.id.surfaceViewFront);
-		surfaceViewFront.setOnClickListener(new MyOnClickListener());
 		surfaceViewFront.getHolder().addCallback(new FrontCallBack());
-	}
+		surfaceViewFront.setOnClickListener(myOnClickListener);
+		surfaceViewFront.setOnLongClickListener(new View.OnLongClickListener() {
 
-	private void initialBackSurface() {
-		MyLog.v("initialBackSurface");
+			@Override
+			public boolean onLongClick(View v) {
+				MyLog.i("ADAS", "reCalibration");
+				if (adasInterface != null) {
+					adasInterface.reCalibration(); // 强制校准
+				}
+				return true;
+			}
+		});
+
 		surfaceViewBack = (SurfaceView) findViewById(R.id.surfaceViewBack);
-		surfaceViewBack.setOnClickListener(new MyOnClickListener());
+		surfaceViewBack.setOnClickListener(myOnClickListener);
 		surfaceViewBack.getHolder().addCallback(new BackCallBack());
 	}
 

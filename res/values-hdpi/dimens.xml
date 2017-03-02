@@ -13,6 +13,8 @@
     <dimen name="icon_hint_text_size">15sp</dimen>
     <dimen name="icon_image_padding_bottom">17dp</dimen>
     <dimen name="icon_hint_margin_bottom">5dp</dimen>
+    <dimen name="position_text_size">17sp</dimen>
+    <dimen name="position_margin">5px</dimen>
 
     <!-- ADAS Setting -->
     <dimen name="adas_setting_item_height">80px</dimen>

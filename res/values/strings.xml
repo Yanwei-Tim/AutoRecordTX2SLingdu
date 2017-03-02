@@ -5,6 +5,8 @@
     <string name="hello_world">Hello world!</string>
 
     <!-- Record -->
+    <string name="hint_position_front">前</string>
+    <string name="hint_position_back">后</string>
     <string name="hint_video_lock">录像加锁</string>
     <string name="hint_video_unlock">录像解锁</string>
     <string name="hint_video_size_720">分辨率七二零P</string>
@@ -33,7 +35,7 @@
     <string name="short_record">REC</string>
     <string name="hint_save_video_error">视频保存失败</string>
     <string name="hint_save_photo_error">图片保存失败</string>
-    <string name="hint_going_shutdown">系统关机，停止录像</string>
+    <string name="hint_going_shutdown">停止录像</string>
 
     <!-- UncaughtExceptionHandler -->
     <string name="app_has_exception">很抱歉录像异常，即将退出</string>
