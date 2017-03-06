@@ -85,6 +85,7 @@
         android:layout_height="match_parent" >
 
         <RelativeLayout
+            android:id="@+id/layoutControlButtonLeft"
             android:layout_width="@dimen/side_shadow_width"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true" >
@@ -92,7 +93,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/icon_area_height"
-                android:layout_marginTop="@dimen/icon_area_margin_top_bottom" >
+                android:layout_marginTop="@dimen/icon_area_margin_top" >
 
                 <ImageButton
                     android:id="@+id/imageVideoSize"
@@ -147,7 +148,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/icon_area_height"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="@dimen/icon_area_margin_top_bottom" >
+                android:layout_marginBottom="@dimen/icon_area_margin_bottom" >
 
                 <ImageButton
                     android:id="@+id/imageVideoMute"
@@ -173,6 +174,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/layoutControlButtonRight"
             android:layout_width="@dimen/side_shadow_width"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true" >
@@ -182,7 +184,7 @@
                 android:layout_height="@dimen/icon_area_height"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="@dimen/icon_area_margin_top_bottom" >
+                android:layout_marginTop="@dimen/icon_area_margin_top" >
 
                 <ImageButton
                     android:id="@+id/imageVideoLock"
@@ -225,7 +227,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/icon_area_height"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="@dimen/icon_area_margin_top_bottom" >
+                android:layout_marginBottom="@dimen/icon_area_margin_bottom" >
 
                 <ImageButton
                     android:id="@+id/imageCameraSwitch"
@@ -250,22 +252,6 @@
             </RelativeLayout>
         </RelativeLayout>
 
-        <TextClock
-            android:id="@+id/textRecordTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/record_time_margin_top"
-            android:format12Hour="yyyy-MM-dd HH:mm:ss"
-            android:format24Hour="yyyy-MM-dd HH:mm:ss"
-            android:shadowColor="#000000"
-            android:shadowDx="1.5"
-            android:shadowDy="1.5"
-            android:shadowRadius="2.5"
-            android:textColor="#ffffff"
-            android:textSize="17sp"
-            android:visibility="gone" />
-
         <TextView
             android:id="@+id/textLatLng"
             android:layout_width="wrap_content"
@@ -286,7 +272,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/icon_area_margin_top_bottom"
+            android:layout_marginBottom="30dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@null"
             android:src="@drawable/photo_take" />
@@ -297,32 +283,78 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY" />
 
-        <TextView
-            android:id="@+id/textPositionFront"
+        <TextClock
+            android:id="@+id/textSystemTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/position_margin"
+            android:layout_margin="@dimen/record_time_margin_top"
+            android:format12Hour="yyyy-MM-dd hh:mm:ss"
+            android:format24Hour="yyyy-MM-dd HH:mm:ss"
+            android:shadowColor="#000000"
+            android:shadowDx="1.5"
+            android:shadowDy="1.5"
+            android:shadowRadius="2.5"
+            android:textColor="#ffffff"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/textPositionCenter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/position_margin_top"
+            android:layout_toLeftOf="@id/imagePhotoTake"
             android:shadowColor="#000000"
             android:shadowDx="1.5"
             android:shadowDy="1.5"
             android:shadowRadius="2.5"
             android:text="@string/hint_position_front"
             android:textColor="#ff0000"
-            android:textSize="@dimen/position_text_size" />
+            android:textSize="@dimen/position_text_size"
+            android:visibility="gone" />
 
         <TextView
-            android:id="@+id/textPositionBack"
+            android:id="@+id/textTimeCenter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_margin="@dimen/position_margin"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="@dimen/position_margin_top"
+            android:layout_toLeftOf="@id/textPositionCenter"
             android:shadowColor="#000000"
             android:shadowDx="1.5"
             android:shadowDy="1.5"
             android:shadowRadius="2.5"
-            android:text="@string/hint_position_back"
+            android:textColor="#ff0000"
+            android:textSize="@dimen/record_time_text_size"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/textPositionRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/position_margin_top"
+            android:layout_toLeftOf="@id/layoutControlButtonRight"
+            android:shadowColor="#000000"
+            android:shadowDx="1.5"
+            android:shadowDy="1.5"
+            android:shadowRadius="2.5"
+            android:text="@string/hint_position_front"
             android:textColor="#ff0000"
             android:textSize="@dimen/position_text_size"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/textTimeRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10px"
+            android:layout_marginTop="@dimen/position_margin_top"
+            android:layout_toLeftOf="@id/textPositionRight"
+            android:shadowColor="#000000"
+            android:shadowDx="1.5"
+            android:shadowDy="1.5"
+            android:shadowRadius="2.5"
+            android:textColor="#ff0000"
+            android:textSize="@dimen/record_time_text_size"
             android:visibility="gone" />
     </RelativeLayout>
 
