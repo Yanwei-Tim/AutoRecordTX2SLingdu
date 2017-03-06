@@ -80,10 +80,11 @@ public class MainActivity extends Activity {
 	private WakeLock fullWakeLock;
 
 	private TextView textLatLng; // 经纬度
-	private TextView textPositionFront, textPositionBack;
+	private TextView textPositionCenter, textPositionRight;
 	// 前置
 	private RelativeLayout layoutFront;
-	private TextClock textRecordTime; // 时间跑秒
+	private TextView textTimeCenter, textTimeRight; // 时间跑秒
+	private TextClock textSystemTime;
 	private ImageButton imageRecordState; // 录像按钮
 	private ImageButton imageVideoLock; // 加锁按钮
 	private TextView textVideoLock;
@@ -1140,11 +1141,18 @@ public class MainActivity extends Activity {
 		textLatLng.setTypeface(Typefaces.get(this, Constant.Path.FONT
 				+ "Font-Helvetica-Neue-LT-Pro.otf"));
 
-		textPositionFront = (TextView) findViewById(R.id.textPositionFront);
-		textPositionBack = (TextView) findViewById(R.id.textPositionBack);
+		textPositionCenter = (TextView) findViewById(R.id.textPositionCenter);
+		textPositionRight = (TextView) findViewById(R.id.textPositionRight);
 
-		textRecordTime = (TextClock) findViewById(R.id.textRecordTime);
-		textRecordTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
+		textTimeCenter = (TextView) findViewById(R.id.textTimeCenter);
+		textTimeCenter.setTypeface(Typefaces.get(this, Constant.Path.FONT
+				+ "Font-Quartz-Regular.ttf"));
+		textTimeRight = (TextView) findViewById(R.id.textTimeRight);
+		textTimeRight.setTypeface(Typefaces.get(this, Constant.Path.FONT
+				+ "Font-Quartz-Regular.ttf"));
+
+		textSystemTime = (TextClock) findViewById(R.id.textSystemTime);
+		textSystemTime.setTypeface(Typefaces.get(this, Constant.Path.FONT
 				+ "Font-Helvetica-Neue-LT-Pro.otf"));
 
 		// 录制
@@ -1207,8 +1215,10 @@ public class MainActivity extends Activity {
 		} else {
 			imageBackLineShow.setImageDrawable(getResources().getDrawable(
 					R.drawable.back_line_show, null));
-			imageBackLineEdit.setVisibility(View.VISIBLE);
-			imageBackLineReset.setVisibility(View.VISIBLE);
+			if (MyApp.isFrontRecording) {
+				imageBackLineEdit.setVisibility(View.VISIBLE);
+				imageBackLineReset.setVisibility(View.VISIBLE);
+			}
 		}
 	}
 
@@ -1225,8 +1235,17 @@ public class MainActivity extends Activity {
 					1));
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
-			textPositionFront.setVisibility(View.VISIBLE);
-			textPositionBack.setVisibility(View.GONE);
+			textPositionCenter.setVisibility(View.GONE);
+			textPositionRight.setVisibility(View.VISIBLE);
+			textPositionRight.setText(getString(R.string.hint_position_front));
+
+			if (MyApp.isFrontRecording) {
+				textTimeRight.setVisibility(View.VISIBLE);
+				textTimeCenter.setVisibility(View.GONE);
+			} else {
+				textTimeRight.setVisibility(View.GONE);
+				textTimeCenter.setVisibility(View.GONE);
+			}
 			break;
 
 		case 1: // BACK
@@ -1240,12 +1259,24 @@ public class MainActivity extends Activity {
 					Name.BACK_CAR_STATE, "0");
 			if ("1".equals(strBackState)) {
 				setBackLineVisible(true);
-				textPositionFront.setVisibility(View.GONE);
-				textPositionBack.setVisibility(View.GONE);
+				textPositionCenter.setVisibility(View.GONE);
+				textPositionRight.setVisibility(View.GONE);
+				textTimeRight.setVisibility(View.GONE);
+				textTimeCenter.setVisibility(View.GONE);
 			} else {
 				setBackLineVisible(false);
-				textPositionFront.setVisibility(View.GONE);
-				textPositionBack.setVisibility(View.VISIBLE);
+				textPositionCenter.setVisibility(View.GONE);
+				textPositionRight.setVisibility(View.VISIBLE);
+				textPositionRight
+						.setText(getString(R.string.hint_position_back));
+
+				if (MyApp.isFrontRecording) {
+					textTimeRight.setVisibility(View.VISIBLE);
+					textTimeCenter.setVisibility(View.GONE);
+				} else {
+					textTimeRight.setVisibility(View.GONE);
+					textTimeCenter.setVisibility(View.GONE);
+				}
 			}
 			break;
 
@@ -1261,8 +1292,17 @@ public class MainActivity extends Activity {
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
 
-			textPositionFront.setVisibility(View.VISIBLE);
-			textPositionBack.setVisibility(View.VISIBLE);
+			textPositionCenter.setVisibility(View.VISIBLE);
+			textPositionRight.setVisibility(View.VISIBLE);
+			textPositionRight.setText(getString(R.string.hint_position_back));
+
+			if (MyApp.isFrontRecording) {
+				textTimeRight.setVisibility(View.VISIBLE);
+				textTimeCenter.setVisibility(View.VISIBLE);
+			} else {
+				textTimeRight.setVisibility(View.GONE);
+				textTimeCenter.setVisibility(View.GONE);
+			}
 		}
 			break;
 
@@ -1286,8 +1326,17 @@ public class MainActivity extends Activity {
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
 
-			textPositionFront.setVisibility(View.VISIBLE);
-			textPositionBack.setVisibility(View.GONE);
+			textPositionCenter.setVisibility(View.GONE);
+			textPositionRight.setVisibility(View.VISIBLE);
+			textPositionRight.setText(getString(R.string.hint_position_front));
+
+			if (MyApp.isFrontRecording) {
+				textTimeRight.setVisibility(View.VISIBLE);
+				textTimeCenter.setVisibility(View.GONE);
+			} else {
+				textTimeRight.setVisibility(View.GONE);
+				textTimeCenter.setVisibility(View.GONE);
+			}
 			break;
 
 		case 1:
@@ -1297,8 +1346,17 @@ public class MainActivity extends Activity {
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 
-			textPositionFront.setVisibility(View.GONE);
-			textPositionBack.setVisibility(View.VISIBLE);
+			textPositionCenter.setVisibility(View.GONE);
+			textPositionRight.setVisibility(View.VISIBLE);
+			textPositionRight.setText(getString(R.string.hint_position_back));
+
+			if (MyApp.isFrontRecording) {
+				textTimeRight.setVisibility(View.VISIBLE);
+				textTimeCenter.setVisibility(View.GONE);
+			} else {
+				textTimeRight.setVisibility(View.GONE);
+				textTimeCenter.setVisibility(View.GONE);
+			}
 			break;
 
 		case 2: { // FRONT + BACK
@@ -1313,8 +1371,17 @@ public class MainActivity extends Activity {
 			layoutBack.setVisibility(View.GONE);
 			setBackLineVisible(false);
 
-			textPositionFront.setVisibility(View.VISIBLE);
-			textPositionBack.setVisibility(View.VISIBLE);
+			textPositionCenter.setVisibility(View.VISIBLE);
+			textPositionRight.setVisibility(View.VISIBLE);
+			textPositionRight.setText(getString(R.string.hint_position_back));
+
+			if (MyApp.isFrontRecording) {
+				textTimeRight.setVisibility(View.VISIBLE);
+				textTimeCenter.setVisibility(View.VISIBLE);
+			} else {
+				textTimeRight.setVisibility(View.GONE);
+				textTimeCenter.setVisibility(View.GONE);
+			}
 		}
 			break;
 
@@ -1483,7 +1550,8 @@ public class MainActivity extends Activity {
 					MyApp.shouldVideoRecordWhenChangeSize = MyApp.isFrontRecording;
 					MyApp.isFrontRecording = false;
 					resetRecordTimeText();
-					textRecordTime.setVisibility(View.INVISIBLE);
+					// textTimeFront.setVisibility(View.INVISIBLE);
+					// textTimeBack.setVisibility(View.INVISIBLE);
 					if (MyApp.resolutionState == 1080) {
 						setFrontResolution(720);
 						editor.putString("videoSize", "720");
@@ -1775,7 +1843,8 @@ public class MainActivity extends Activity {
 	private void stopFrontRecorder5Times() {
 		if (isFrontRecord()) {
 			new Thread(new StopFrontRecordThread()).start();
-			textRecordTime.setVisibility(View.INVISIBLE);
+			textTimeCenter.setVisibility(View.INVISIBLE);
+			textTimeRight.setVisibility(View.INVISIBLE);
 			resetRecordTimeText();
 		}
 	}
@@ -2228,14 +2297,21 @@ public class MainActivity extends Activity {
 		if (isVideoRecord) {
 			if (!MyApp.isFrontRecording) {
 				MyApp.isFrontRecording = true;
-				textRecordTime.setVisibility(View.VISIBLE);
+				textTimeRight.setVisibility(View.VISIBLE);
+				if (cameraBeforeBack == 2) {
+					textTimeCenter.setVisibility(View.VISIBLE);
+				} else {
+					textTimeCenter.setVisibility(View.GONE);
+				}
+
 				startUpdateRecordTimeThread();
 				setupRecordViews();
 			}
 		} else {
 			if (MyApp.isFrontRecording) {
 				MyApp.isFrontRecording = false;
-				textRecordTime.setVisibility(View.INVISIBLE);
+				textTimeRight.setVisibility(View.INVISIBLE);
+				textTimeCenter.setVisibility(View.INVISIBLE);
 				resetRecordTimeText();
 				MyApp.isRecordTimeUpdating = false;
 				setupRecordViews();
@@ -2278,7 +2354,8 @@ public class MainActivity extends Activity {
 	 */
 	private void resetRecordTimeText() {
 		recordTimeCount = -1;
-		// textRecordTime.setText("00 : 00");
+		textTimeRight.setText("00 : 00");
+		textTimeCenter.setText("00 : 00");
 	}
 
 	/** 开启录像跑秒线程 */
@@ -2429,8 +2506,10 @@ public class MainActivity extends Activity {
 					}
 					break;
 				}
-				// textRecordTime.setText(DateUtil
-				// .getFormatTimeBySecond(recordTimeCount));
+				String recordTime = DateUtil
+						.getFormatTimeBySecond(recordTimeCount);
+				textTimeRight.setText(recordTime);
+				textTimeCenter.setText(recordTime);
 
 				this.removeMessages(1);
 				break;
