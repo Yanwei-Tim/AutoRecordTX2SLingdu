@@ -52,7 +52,7 @@ public class BackLineView extends View {
 
 	// TX2S-9.76-全屏
 	private static final int DEFALT_1X_X2S_FULL = 470;
-	private static final int DEFALT_1Y_X2S_FULL = 445;
+	private static final int DEFALT_1Y_X2S_FULL = 455;
 	private static final int DEFALT_2X_X2S_FULL = 526;
 	private static final int DEFALT_2Y_X2S_FULL = 365;
 	private static final int DEFALT_3X_X2S_FULL = 612;
