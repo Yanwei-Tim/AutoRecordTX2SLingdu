@@ -72,7 +72,11 @@ public class SensorWatchService extends Service {
 							isCrash = true;
 						}
 						if (isCrash) { // 当前录制视频加锁
-							if (MyApp.isFrontRecording && !MyApp.isFrontLock) {
+							if (!MyApp.isFrontRecording) {
+								MyApp.shouldMountRecordFront = true;
+								MyApp.shouldMountRecordBack = true;
+							}
+							if (!MyApp.isFrontLock) {
 								MyApp.isFrontLock = true;
 								MyApp.isFrontCrashed = true;
 								MyApp.isBackLock = true;
@@ -91,6 +95,7 @@ public class SensorWatchService extends Service {
 										+ ",Y:"
 										+ valueY + ",Z:" + valueZ);
 							}
+
 							isCrash = false; // 重置碰撞标志位
 						}
 					}

@@ -777,11 +777,19 @@ public class MainActivity extends Activity {
 				} else if ("take_photo_dsa".equals(command)) { // 语音拍照上传
 					takePhoto(MyApp.isAccOn);
 				} else if ("dvr_record_lock".equals(command)) { // 录像加锁
+					if (!MyApp.isFrontLock) {
+						speakVoice(getString(R.string.hint_video_lock));
+					}
 					MyApp.isFrontLock = true;
 					MyApp.isBackLock = true;
+					setupRecordViews();
 				} else if ("dvr_record_unlock".equals(command)) { // 录像解锁
+					if (MyApp.isFrontLock) {
+						speakVoice(getString(R.string.hint_video_unlock));
+					}
 					MyApp.isFrontLock = false;
 					MyApp.isBackLock = false;
+					setupRecordViews();
 				} else if ("dvr_record_mic_open".equals(command)) { // 打开录音-UNMUTE
 					// 切换录音/静音状态停止录像，需要重置时间
 					if (muteState == Constant.Record.STATE_MUTE) {
