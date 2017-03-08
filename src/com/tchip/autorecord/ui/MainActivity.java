@@ -28,8 +28,6 @@ import com.tchip.tachograph.TachographCallback;
 import com.tchip.tachograph.TachographRecorder;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -3005,15 +3003,19 @@ public class MainActivity extends Activity {
 							speed = 80.0;
 						}
 						adasBitmap.eraseColor(Color.TRANSPARENT);
-						if (adasInterface.process_yuv(data, speed, adasOutput,
-								ADASInterface.YUV_FORMAT_YV12) == 0) {
-							Canvas mCanvas = new Canvas(adasBitmap);
-							mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
-						} else {
-							AdasUtil.sendBroadcastByOutput(context, adasOutput);
+
+						if (speed >= MyApp.adasThreshold) {
+							if (adasInterface.process_yuv(data, speed,
+									adasOutput, ADASInterface.YUV_FORMAT_YV12) == 0) {
+								Canvas mCanvas = new Canvas(adasBitmap);
+								mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
+							} else {
+								AdasUtil.sendBroadcastByOutput(context,
+										adasOutput);
+							}
+							adasInterface.Draw853480(adasBitmap, adasOutput);
+							imageAdas.setImageBitmap(adasBitmap);
 						}
-						adasInterface.Draw853480(adasBitmap, adasOutput);
-						imageAdas.setImageBitmap(adasBitmap);
 					} else { // AdasInterface未初始化
 						MyLog.i("ADAS", "isAdasInitial == false");
 						if (licenseInterface.isLicensed(context)) {

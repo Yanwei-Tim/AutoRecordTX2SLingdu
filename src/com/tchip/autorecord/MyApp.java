@@ -26,6 +26,9 @@ public class MyApp extends Application {
 	public static boolean shouldMountRecordFront = false;
 	public static boolean shouldMountRecordBack = false;
 
+	/** 当前ADAS门限 */
+	public static double adasThreshold = 20.0;
+
 	/**
 	 * 分辨率
 	 * 

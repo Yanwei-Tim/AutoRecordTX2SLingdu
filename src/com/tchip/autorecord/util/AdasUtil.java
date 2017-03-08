@@ -10,6 +10,7 @@ import java.util.Locale;
 
 import com.sinosmart.adas.ADASInterface;
 import com.tchip.autorecord.Constant;
+import com.tchip.autorecord.MyApp;
 import com.tchip.autorecord.util.ProviderUtil.Name;
 
 import android.content.Context;
@@ -110,12 +111,16 @@ public class AdasUtil {
 					Name.ADAS_THRESHOLD, "20"); // 设置最低预警车速，低于该速度不预警
 			if ("0".equals(adasThreshold)) {
 				adasInterface.setSpeedThreshold(0);
+				MyApp.adasThreshold = 0.0;
 			} else if ("50".equals(adasThreshold)) {
 				adasInterface.setSpeedThreshold(50);
+				MyApp.adasThreshold = 50.0;
 			} else if ("80".equals(adasThreshold)) {
 				adasInterface.setSpeedThreshold(80);
+				MyApp.adasThreshold = 80.0;
 			} else {
 				adasInterface.setSpeedThreshold(20);
+				MyApp.adasThreshold = 20.0;
 			}
 
 			// adasInterface.SetForwardDistBias(bias); // 为车距添加修正值:-10~+10m
