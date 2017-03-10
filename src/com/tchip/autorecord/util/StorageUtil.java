@@ -482,6 +482,7 @@ public class StorageUtil {
 							Bitmap bitmapThumbnail = getVideoThumbnail(
 									file.getPath(), 160, 90,
 									MediaStore.Video.Thumbnails.MINI_KIND);
+							new File(Constant.Path.VIDEO_THUMBNAIL).mkdirs();
 							saveOneBitmap(bitmapThumbnail, thumbnailPath);
 						}
 						return;
@@ -570,6 +571,8 @@ public class StorageUtil {
 							&& fileName.endsWith(".mp4")
 							&& !fileName.startsWith(".")) {
 						boolean isSuccess = fileOldest.delete();
+						deleteThumbnailByVideo(fileOldest);
+
 						MyLog.i("releaseFrontStorage.DEL Unlock:" + fileName
 								+ " " + isSuccess);
 
@@ -584,6 +587,7 @@ public class StorageUtil {
 								&& fileName.endsWith(".mp4")
 								&& !fileName.startsWith(".")) {
 							boolean isSuccess = fileOldest.delete();
+							deleteThumbnailByVideo(fileOldest);
 							MyLog.i("releaseFrontStorage.DEL Lock:" + fileName
 									+ " " + isSuccess);
 
@@ -609,6 +613,7 @@ public class StorageUtil {
 							&& fileName.endsWith(".mp4")
 							&& !fileName.startsWith(".")) {
 						boolean isSuccess = fileOldest.delete();
+						deleteThumbnailByVideo(fileOldest);
 						MyLog.i("releaseFrontStorage.DEL Lock:" + fileName
 								+ " " + isSuccess);
 					}
@@ -647,6 +652,7 @@ public class StorageUtil {
 							&& fileName.endsWith(".mp4")
 							&& !fileName.startsWith(".")) {
 						boolean isSuccess = fileOldest.delete();
+						deleteThumbnailByVideo(fileOldest);
 						MyLog.i("releaseBackStorage.DEL Unlock:" + fileName
 								+ " " + isSuccess);
 
@@ -661,6 +667,7 @@ public class StorageUtil {
 								&& fileName.endsWith(".mp4")
 								&& !fileName.startsWith(".")) {
 							boolean isSuccess = fileOldest.delete();
+							deleteThumbnailByVideo(fileOldest);
 							MyLog.i("releaseBackStorage.DEL Lock:" + fileName
 									+ " " + isSuccess);
 
@@ -686,6 +693,7 @@ public class StorageUtil {
 							&& fileName.endsWith(".mp4")
 							&& !fileName.startsWith(".")) {
 						boolean isSuccess = fileOldest.delete();
+						deleteThumbnailByVideo(fileOldest);
 						MyLog.i("releaseBackStorage.DEL Lock:" + fileName + " "
 								+ isSuccess);
 					}
