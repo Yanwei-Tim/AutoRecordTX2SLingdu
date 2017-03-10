@@ -295,6 +295,7 @@ public interface Constant {
 		public static String VIDEO_BACK_LOCK = "/storage/sdcard1/DrivingRecord/VideoBack/Lock";
 
 		public static String IMAGE_BOTH = "/storage/sdcard1/DrivingRecord/Image/";
+		public static String VIDEO_THUMBNAIL = "/storage/sdcard1/DrivingRecord/.Thumbnail/";
 
 		public static String RECORD_DIRECTORY = "/storage/sdcard1/DrivingRecord/";
 

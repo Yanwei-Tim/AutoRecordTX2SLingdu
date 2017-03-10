@@ -1,20 +1,9 @@
 package com.tchip.autorecord.util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.text.DecimalFormat;
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.DialogInterface.OnClickListener;
-import android.view.WindowManager;
 
 import com.tchip.autorecord.Constant;
 import com.tchip.autorecord.MyApp;
-import com.tchip.autorecord.R;
-import com.tchip.autorecord.view.FlashCleanDialog;
 
 public class FileUtil {
 

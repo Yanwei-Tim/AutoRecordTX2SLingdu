@@ -1,10 +1,16 @@
 package com.tchip.autorecord.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import com.tchip.autorecord.Constant;
 import com.tchip.autorecord.MyApp;
@@ -12,8 +18,11 @@ import com.tchip.autorecord.R;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.os.Looper;
 import android.os.StatFs;
+import android.provider.MediaStore;
 import android.widget.Toast;
 
 public class StorageUtil {
@@ -101,6 +110,7 @@ public class StorageUtil {
 			new File(Constant.Path.VIDEO_BACK_LOCK).mkdirs();
 
 			new File(Constant.Path.IMAGE_BOTH).mkdirs();
+			new File(Constant.Path.VIDEO_THUMBNAIL).mkdirs();
 		} catch (Exception e) {
 		}
 	}
@@ -171,6 +181,8 @@ public class StorageUtil {
 					if (childFile.getName().startsWith(videoPrefix)
 							&& childFile.exists()) {
 						childFile.delete();
+						deleteThumbnailByVideo(childFile);
+
 						MyLog.w("[deleteBackByFront]Delete Back:"
 								+ childFile.getPath());
 						for (File childFileOld : childFiles) { // 比删除视频的日期旧的视频也删除
@@ -189,6 +201,7 @@ public class StorageUtil {
 										MyLog.w("[deleteBackByFront]Delete Back OLD:"
 												+ childFileOld.getPath());
 										childFileOld.delete();
+										deleteThumbnailByVideo(childFileOld);
 									}
 								} else if (childYear == thisYear) {
 									int childMonth = Integer
@@ -202,6 +215,7 @@ public class StorageUtil {
 											MyLog.w("[deleteBackByFront]Delete Back OLD:"
 													+ childFileOld.getPath());
 											childFileOld.delete();
+											deleteThumbnailByVideo(childFileOld);
 										}
 									} else if (childMonth == thisMonth) {
 										int childDay = Integer
@@ -217,6 +231,7 @@ public class StorageUtil {
 														+ childFileOld
 																.getPath());
 												childFileOld.delete();
+												deleteThumbnailByVideo(childFileOld);
 											}
 										} else if (childDay == thisDay) {
 											int childHour = Integer
@@ -231,6 +246,7 @@ public class StorageUtil {
 															+ childFileOld
 																	.getPath());
 													childFileOld.delete();
+													deleteThumbnailByVideo(childFileOld);
 												}
 											} else if (childHour == thisHour) {
 												int childMinute = Integer
@@ -247,6 +263,7 @@ public class StorageUtil {
 																+ childFileOld
 																		.getPath());
 														childFileOld.delete();
+														deleteThumbnailByVideo(childFileOld);
 													}
 												}
 											}
@@ -281,6 +298,8 @@ public class StorageUtil {
 					if (childFile.getName().startsWith(videoPrefix)
 							&& childFile.exists()) {
 						childFile.delete();
+						deleteThumbnailByVideo(childFile);
+
 						MyLog.w("[deleteFrontByBack]Delete Front:"
 								+ childFile.getPath());
 						for (File childFileOld : childFiles) { // 比删除视频的日期旧的视频也删除
@@ -299,6 +318,7 @@ public class StorageUtil {
 										MyLog.w("[deleteFrontByBack]Delete Front OLD:"
 												+ childFileOld.getPath());
 										childFileOld.delete();
+										deleteThumbnailByVideo(childFileOld);
 									}
 								} else if (childYear == thisYear) {
 									int childMonth = Integer
@@ -312,6 +332,7 @@ public class StorageUtil {
 											MyLog.w("[deleteFrontByBack]Delete Front OLD:"
 													+ childFileOld.getPath());
 											childFileOld.delete();
+											deleteThumbnailByVideo(childFileOld);
 										}
 									} else if (childMonth == thisMonth) {
 										int childDay = Integer
@@ -327,6 +348,7 @@ public class StorageUtil {
 														+ childFileOld
 																.getPath());
 												childFileOld.delete();
+												deleteThumbnailByVideo(childFileOld);
 											}
 										} else if (childDay == thisDay) {
 											int childHour = Integer
@@ -341,6 +363,7 @@ public class StorageUtil {
 															+ childFileOld
 																	.getPath());
 													childFileOld.delete();
+													deleteThumbnailByVideo(childFileOld);
 												}
 											} else if (childHour == thisHour) {
 												int childMinute = Integer
@@ -357,6 +380,7 @@ public class StorageUtil {
 																+ childFileOld
 																		.getPath());
 														childFileOld.delete();
+														deleteThumbnailByVideo(childFileOld);
 													}
 												}
 											}
@@ -420,6 +444,100 @@ public class StorageUtil {
 						+ e.toString());
 			}
 
+		}
+	}
+
+	/**
+	 * 删除对应THUMBNAIL
+	 * 
+	 * @param fileVideo
+	 */
+	private static boolean deleteThumbnailByVideo(File fileVideo) {
+		String thumbnailPath = Constant.Path.VIDEO_THUMBNAIL
+				+ fileVideo.getName().replace(".mp4", ".jpg");
+		File fileThumbnail = new File(thumbnailPath);
+		if (fileThumbnail.exists() && fileThumbnail.isFile()) {
+			MyLog.i("deleteThumbnailByVideo:" + fileThumbnail.getName());
+			return fileThumbnail.delete();
+		} else
+			return false;
+	}
+
+	/**
+	 * 为没有缩略图的录像创建
+	 * 
+	 * @param context
+	 * @param file
+	 */
+	public static void CreateThumbnailForVideo(Context context, File file) {
+		if (file.exists()) {
+			try {
+				String fileName = file.getName();
+				if (file.isFile()) {
+					if (!fileName.startsWith(".") && fileName.endsWith(".mp4")) {
+						String thumbnailPath = Constant.Path.VIDEO_THUMBNAIL
+								+ fileName.replace(".mp4", ".jpg");
+						if (!new File(thumbnailPath).exists()) {
+							MyLog.i("CreateThumbnailForVideo:" + thumbnailPath);
+							Bitmap bitmapThumbnail = getVideoThumbnail(
+									file.getPath(), 160, 90,
+									MediaStore.Video.Thumbnails.MINI_KIND);
+							saveOneBitmap(bitmapThumbnail, thumbnailPath);
+						}
+						return;
+					}
+				} else if (file.isDirectory()) {
+					File[] childFile = file.listFiles();
+					if (childFile == null || childFile.length == 0) {
+						return;
+					}
+					for (File f : childFile) {
+						CreateThumbnailForVideo(context, f);
+					}
+				}
+			} catch (Exception e) {
+				MyLog.e("StorageUtil.RecursionCheckFile-Catch Exception:"
+						+ e.toString());
+			}
+
+		}
+	}
+
+	/**
+	 * 获取视频的缩略图
+	 * 
+	 * @param videoPath
+	 *            视频路径
+	 * @param width
+	 * @param height
+	 * @param kind
+	 *            eg:MediaStore.Video.Thumbnails.MICRO_KIND MINI_KIND: 512 x
+	 *            384，MICRO_KIND: 96 x 96
+	 * @return
+	 */
+	private static Bitmap getVideoThumbnail(String videoPath, int width,
+			int height, int kind) {
+		Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, kind);
+		bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height,
+				ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+		return bitmap;
+	}
+
+	/** 保存一张bitmap */
+	public static void saveOneBitmap(Bitmap bitmap, String path) {
+		File file = new File(path);
+		if (file.exists()) {
+			file.delete();
+		}
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+			out.flush();
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
