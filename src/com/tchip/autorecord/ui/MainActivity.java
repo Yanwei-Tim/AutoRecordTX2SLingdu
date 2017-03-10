@@ -869,7 +869,6 @@ public class MainActivity extends Activity {
 		public void run() {
 			try {
 				StartCheckErrorFileThread();
-				new Thread(new CreateThumbnailThread()).start();
 
 				Thread.sleep(Constant.Record.autoRecordDelay);
 				if (MyApp.isParkRecording) {
@@ -1941,6 +1940,8 @@ public class MainActivity extends Activity {
 		if (!isVideoChecking) {
 			new Thread(new CheckVideoThread()).start();
 		}
+
+		new Thread(new CreateThumbnailThread()).start();
 	}
 
 	/** 当前是否正在校验错误视频 */
@@ -2109,8 +2110,7 @@ public class MainActivity extends Activity {
 				if (!MyApp.isAccOn) {
 					if (MyApp.isParkRecording) {
 						StartCheckErrorFileThread();
-						new Thread(new CreateThumbnailThread()).start();
-						
+
 						startFrontRecord();
 					} else if (!ClickUtil.isHintSleepTooQuick(3000)) {
 						HintUtil.showToast(MainActivity.this, getResources()
@@ -2118,7 +2118,6 @@ public class MainActivity extends Activity {
 					}
 				} else {
 					StartCheckErrorFileThread();
-					new Thread(new CreateThumbnailThread()).start();
 					startFrontRecord();
 				}
 			} else {
@@ -3159,9 +3158,8 @@ public class MainActivity extends Activity {
 				// setRecordState(false);
 				// }
 				speakVoice(strSaveVideoErr);
-				
+
 				StartCheckErrorFileThread();
-				new Thread(new CreateThumbnailThread()).start();
 				break;
 
 			case TachographCallback.ERROR_SAVE_IMAGE_FAIL:
@@ -3169,9 +3167,8 @@ public class MainActivity extends Activity {
 						getResources()
 								.getString(R.string.hint_save_photo_error));
 				MyLog.e("Front Record Error : ERROR_SAVE_IMAGE_FAIL");
-				
+
 				StartCheckErrorFileThread();
-				new Thread(new CreateThumbnailThread()).start();
 				break;
 
 			case TachographCallback.ERROR_RECORDER_CLOSED:
@@ -3215,7 +3212,6 @@ public class MainActivity extends Activity {
 					setupRecordViews(); // 更新录制按钮状态
 
 					StartCheckErrorFileThread(); // 执行onFileSave时，此file已经不隐藏，下个正在录的为隐藏
-					new Thread(new CreateThumbnailThread()).start();
 				} else { // 图片
 					HintUtil.showToast(MainActivity.this, getResources()
 							.getString(R.string.hint_photo_save));
@@ -3262,9 +3258,8 @@ public class MainActivity extends Activity {
 				// setRecordState(false);
 				// }
 				speakVoice(strSaveVideoErr);
-				
+
 				StartCheckErrorFileThread();
-				new Thread(new CreateThumbnailThread()).start();
 				break;
 
 			case TachographCallback.ERROR_SAVE_IMAGE_FAIL:
@@ -3272,9 +3267,8 @@ public class MainActivity extends Activity {
 						getResources()
 								.getString(R.string.hint_save_photo_error));
 				MyLog.e("Back Record Error : ERROR_SAVE_IMAGE_FAIL");
-				
+
 				StartCheckErrorFileThread();
-				new Thread(new CreateThumbnailThread()).start();
 				break;
 
 			case TachographCallback.ERROR_RECORDER_CLOSED:
@@ -3316,7 +3310,6 @@ public class MainActivity extends Activity {
 					setupRecordViews(); // 更新录制按钮状态
 
 					StartCheckErrorFileThread(); // 执行onFileSave时，此file已经不隐藏，下个正在录的为隐藏
-					new Thread(new CreateThumbnailThread()).start();
 				} else { // 图片
 				}
 
