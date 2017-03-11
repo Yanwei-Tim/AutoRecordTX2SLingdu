@@ -935,6 +935,8 @@ public class MainActivity extends Activity {
 		}
 	};
 
+	private double tempSpeed = 0.0f;
+
 	/** 后台线程，用以监测是否需要录制碰撞加锁视频(停车侦测) */
 	public class BackgroundThread implements Runnable {
 
@@ -967,6 +969,21 @@ public class MainActivity extends Activity {
 					Message messageDeleteLock = new Message();
 					messageDeleteLock.what = 2;
 					backgroundHandler.sendMessage(messageDeleteLock);
+				}
+
+				tempSpeed = adasSpeed;
+				if (recorderFront != null) {
+					if ("1".equals(ProviderUtil.getValue(context,
+							Name.ADAS_INDOOR_DEBUG, "0"))) {
+						tempSpeed = 80.0;
+					} else {
+						tempSpeed = 0.0;
+					}
+					if (tempSpeed >= MyApp.adasThreshold) {
+						recorderFront.setScaledStreamEnable(true, 640, 480);
+					} else {
+						recorderFront.setScaledStreamEnable(false, 640, 480);
+					}
 				}
 			}
 		}
@@ -3002,46 +3019,48 @@ public class MainActivity extends Activity {
 		recorderFront.setAudioSampleRate(48000);
 
 		recorderFront.setScaledStreamEnable(true, 640, 480);
-		recorderFront.setScaledStreamCallback(new ScaledStreamCallback() {
-
-			@Override
-			public void onScaledStream(byte[] data, int width, int height) {
-				if (MyApp.isAccOn) {
-					if (isAdasInitial) {
-						double speed = adasSpeed;
-						if ("1".equals(ProviderUtil.getValue(context,
-								Name.ADAS_INDOOR_DEBUG, "0"))) {
-							speed = 80.0;
-						}
-						adasBitmap.eraseColor(Color.TRANSPARENT);
-
-						if (speed >= MyApp.adasThreshold) {
-							if (adasInterface.process_yuv(data, speed,
-									adasOutput, ADASInterface.YUV_FORMAT_YV12) == 0) {
-								Canvas mCanvas = new Canvas(adasBitmap);
-								mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
-							} else {
-								AdasUtil.sendBroadcastByOutput(context,
-										adasOutput);
-							}
-							adasInterface.Draw853480(adasBitmap, adasOutput);
-							imageAdas.setImageBitmap(adasBitmap);
-						}
-					} else { // AdasInterface未初始化
-						MyLog.i("ADAS", "isAdasInitial == false");
-						if (licenseInterface.isLicensed(context)) {
-							initialAdasInterface();
-						}
-					}
-				}
-			}
-		});
+		recorderFront.setScaledStreamCallback(scaledStreamCallback);
 
 		recorderFront.prepare();
 		// } catch (Exception e) {
 		// MyLog.e("setupRecorder: Catch Exception：" + e.toString());
 		// }
 	}
+
+	private ScaledStreamCallback scaledStreamCallback = new ScaledStreamCallback() {
+
+		@Override
+		public void onScaledStream(byte[] data, int width, int height) {
+			// MyLog.i("ADAS", "onScaledStream");
+			if (MyApp.isAccOn) {
+				if (isAdasInitial) {
+					double speed = adasSpeed;
+					if ("1".equals(ProviderUtil.getValue(context,
+							Name.ADAS_INDOOR_DEBUG, "0"))) {
+						speed = 80.0;
+					}
+					adasBitmap.eraseColor(Color.TRANSPARENT);
+
+					if (speed >= MyApp.adasThreshold) {
+						if (adasInterface.process_yuv(data, speed, adasOutput,
+								ADASInterface.YUV_FORMAT_YV12) == 0) {
+							Canvas mCanvas = new Canvas(adasBitmap);
+							mCanvas.drawText("授权码错误", 100, 480 - 100, paint);
+						} else {
+							AdasUtil.sendBroadcastByOutput(context, adasOutput);
+						}
+						adasInterface.Draw853480(adasBitmap, adasOutput);
+						imageAdas.setImageBitmap(adasBitmap);
+					}
+				} else { // AdasInterface未初始化
+					MyLog.i("ADAS", "isAdasInitial == false");
+					if (licenseInterface.isLicensed(context)) {
+						initialAdasInterface();
+					}
+				}
+			}
+		}
+	};
 
 	private void authAdas() {
 		if (TelephonyUtil.isNetworkConnected(context)) {
