@@ -51,13 +51,13 @@ public class AdasUtil {
 		if (adasOutput.length >= 4 && adasOutput[4] == 1) {
 			MyLog.i("ADAS", "[4] == 1");
 			context.sendBroadcast(new Intent(Constant.Broadcast.ADAS_MSG)
-					.putExtra("type", "right"));
+					.putExtra("type", "left"));
 		}
 
 		if (adasOutput.length >= 9 && adasOutput[9] == 1) {
 			MyLog.i("ADAS", "[9] == 1");
 			context.sendBroadcast(new Intent(Constant.Broadcast.ADAS_MSG)
-					.putExtra("type", "left"));
+					.putExtra("type", "right"));
 		}
 
 		if (adasOutput.length >= 14 && adasOutput[14] == 1) {
