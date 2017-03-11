@@ -935,8 +935,6 @@ public class MainActivity extends Activity {
 		}
 	};
 
-	private double tempSpeed = 0.0f;
-
 	/** 后台线程，用以监测是否需要录制碰撞加锁视频(停车侦测) */
 	public class BackgroundThread implements Runnable {
 
@@ -971,19 +969,20 @@ public class MainActivity extends Activity {
 					backgroundHandler.sendMessage(messageDeleteLock);
 				}
 
-				tempSpeed = adasSpeed;
+				// 开关裁剪
 				if (recorderFront != null) {
 					if ("1".equals(ProviderUtil.getValue(context,
 							Name.ADAS_INDOOR_DEBUG, "0"))) {
-						tempSpeed = 80.0;
-					} else {
-						tempSpeed = 0.0;
-					}
-					if (tempSpeed >= MyApp.adasThreshold) {
 						recorderFront.setScaledStreamEnable(true, 640, 480);
 					} else {
-						recorderFront.setScaledStreamEnable(false, 640, 480);
+						if (adasSpeed >= MyApp.adasThreshold) {
+							recorderFront.setScaledStreamEnable(true, 640, 480);
+						} else {
+							recorderFront
+									.setScaledStreamEnable(false, 640, 480);
+						}
 					}
+
 				}
 			}
 		}
