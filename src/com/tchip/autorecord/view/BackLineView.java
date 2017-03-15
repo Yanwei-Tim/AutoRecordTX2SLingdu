@@ -1,6 +1,5 @@
 package com.tchip.autorecord.view;
 
-import com.tchip.autorecord.Constant;
 import com.tchip.autorecord.R;
 
 import android.content.Context;
@@ -58,7 +57,7 @@ public class BackLineView extends View {
 	private static final int DEFALT_3X_X2S_FULL = 612;
 	private static final int DEFALT_3Y_X2S_FULL = 285;
 	private static final int DEFALT_4X_X2S_FULL = 665;
-	private static final int DEFALT_4Y_X2S_FULL = 212;
+	private static final int DEFALT_4Y_X2S_FULL = 180; // 212
 	private static final int DEFALT_5X_X2S_FULL = 1220;
 	private static final int DEFALT_5Y_X2S_FULL = DEFALT_4Y_X2S_FULL;
 	private static final int DEFALT_6X_X2S_FULL = 1324;
@@ -143,9 +142,13 @@ public class BackLineView extends View {
 	int[] point8 = { DEFALT_8X, DEFALT_8Y };
 
 	/** 线短粗细 */
-	private int LINE_WIDTH = 8;
+	private int LINE_STROKE_WIDTH = 8;
+	private int TEXT_STROKE_WIDTH = 1;
 	/** 编辑指示图半径 */
 	private int POINT_HINT_RADIUS = 25;
+	private int TEXT_SIZE = 35;
+	/** 文字垂直偏移 */
+	private int TEXT_RADIUS = 15;
 	/** 是否是编辑模式 */
 	private boolean isModifyMode = false;
 	/** 手指是否按下 */
@@ -251,9 +254,9 @@ public class BackLineView extends View {
 
 		loadPointConfig();
 		Paint paint = new Paint();
-		paint.setStyle(Paint.Style.STROKE);// 空心
+		paint.setStyle(Paint.Style.FILL_AND_STROKE);// STROKE-空心
 		paint.setAntiAlias(true); // 抗锯齿
-		paint.setStrokeWidth(LINE_WIDTH); // 粗细
+		paint.setStrokeWidth(LINE_STROKE_WIDTH); // 粗细
 		Path path = new Path();
 
 		// Line 3-4 5-6
@@ -264,6 +267,15 @@ public class BackLineView extends View {
 		path.lineTo(point6[0], point6[1]); // 6
 		canvas.drawPath(path, paint);
 
+		// 5m
+		paint.setStrokeWidth(TEXT_STROKE_WIDTH);
+		paint.setTextSize(TEXT_SIZE);
+		canvas.drawText(context.getString(R.string.back_line_green),
+				point5[0] + 30, point5[1] + TEXT_RADIUS, paint);
+		canvas.drawText(context.getString(R.string.back_line_green),
+				point4[0] - 80, point4[1] + TEXT_RADIUS, paint);
+		paint.setStrokeWidth(LINE_STROKE_WIDTH);
+
 		// Line 2-3 6-7
 		paint.setColor(colorYellow);
 		path.reset();
@@ -273,6 +285,15 @@ public class BackLineView extends View {
 		path.lineTo(point7[0], point7[1]); // 7
 		canvas.drawPath(path, paint);
 
+		// 3m
+		paint.setStrokeWidth(TEXT_STROKE_WIDTH);
+		paint.setTextSize(TEXT_SIZE);
+		canvas.drawText(context.getString(R.string.back_line_yellow),
+				point6[0] + 30, point6[1] + TEXT_RADIUS, paint);
+		canvas.drawText(context.getString(R.string.back_line_yellow),
+				point3[0] - 80, point3[1] + TEXT_RADIUS, paint);
+		paint.setStrokeWidth(LINE_STROKE_WIDTH);
+
 		// Line 1-2 7-8
 		paint.setColor(colorRed);
 		path.reset();
@@ -281,6 +302,15 @@ public class BackLineView extends View {
 		path.moveTo(point7[0], point7[1]); // 7
 		path.lineTo(point8[0], point8[1]); // 8
 		canvas.drawPath(path, paint);
+
+		// STOP
+		paint.setStrokeWidth(TEXT_STROKE_WIDTH);
+		paint.setTextSize(TEXT_SIZE);
+		canvas.drawText(context.getString(R.string.back_line_red),
+				point7[0] + 30, point7[1] + TEXT_RADIUS, paint);
+		canvas.drawText(context.getString(R.string.back_line_red),
+				point2[0] - 100, point2[1] + TEXT_RADIUS, paint);
+		paint.setStrokeWidth(LINE_STROKE_WIDTH);
 
 		PathEffect effect = new DashPathEffect(new float[] { 14, 14, 14, 14 },
 				1); // {实线,空白,实线,空白:偶数}

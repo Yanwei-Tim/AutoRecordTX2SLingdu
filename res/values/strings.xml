@@ -94,5 +94,10 @@
     <string name="adas_restore_fail_no_item">授权恢复失败，未找到授权记录</string>
     <string name="adas_restore_fail_too_frequency">恢复授权失败，恢复过频繁</string>
     <string name="adas_verify_fail_check_network">网络错误</string>
+    
+    <!-- BackLine -->
+    <string name="back_line_red">STOP</string>
+    <string name="back_line_yellow">3m</string>
+    <string name="back_line_green">5m</string>
 
 </resources>
