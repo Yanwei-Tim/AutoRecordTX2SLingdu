@@ -51,6 +51,7 @@
     <string name="icon_hint_mute">静音</string>
     <string name="icon_hint_unmute">录音</string>
     <string name="icon_hint_switch">切换</string>
+    <string name="icon_hint_exit">退出</string>
 
     <!-- FlashCleanDialog -->
     <string name="dialog_flash_clean_title">提示</string>

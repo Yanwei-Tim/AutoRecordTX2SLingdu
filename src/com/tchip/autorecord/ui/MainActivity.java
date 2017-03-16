@@ -122,8 +122,8 @@ public class MainActivity extends Activity {
 	private Handler mMainHandler; // 主线程Handler
 
 	/** UI配置 */
-	private int CAMERA_WIDTH = 1184;
-	private int CAMERA_HEIGHT = 455; // 480;
+	private int CAMERA_WIDTH = 1920;
+	private int CAMERA_HEIGHT = 480; // 480;
 
 	// ADAS
 	private ADASInterface adasInterface;
@@ -149,8 +149,8 @@ public class MainActivity extends Activity {
 		mMainHandler = new Handler(this.getMainLooper());
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		CAMERA_WIDTH = 1280;
-		CAMERA_HEIGHT = 455;
+		CAMERA_WIDTH = 1920;//1280;
+		CAMERA_HEIGHT = 480;//455;
 
 		setStatusBarVisible(true);
 		setContentView(R.layout.activity_main_tx2s);
@@ -274,6 +274,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onResume() {
+		setStatusBarVisible(false);
 		MyLog.v("onResume");
 
 		ProviderUtil.setValue(context, Name.RECORD_INITIAL, "1");
@@ -323,6 +324,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStop() {
 		MyLog.v("onStop");
+		setStatusBarVisible(true);
 		super.onStop();
 	}
 
@@ -535,7 +537,7 @@ public class MainActivity extends Activity {
 			}
 		} else {
 			setBackLineVisible(false);
-			setStatusBarVisible(true);
+//			setStatusBarVisible(true);
 			layoutBack.setVisibility(View.VISIBLE);
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
 					CAMERA_WIDTH, CAMERA_HEIGHT)); // 1280 * 445

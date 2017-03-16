@@ -5,13 +5,14 @@
     <dimen name="record_time_text_size">23sp</dimen>
     <dimen name="record_time_margin_right">10px</dimen>
     <dimen name="record_time_margin_top">5dp</dimen>
+    <dimen name="record_time_margin_left">130px</dimen>
     <dimen name="surface_front_width">569dp</dimen>
     <dimen name="surface_back_width">427dp</dimen>
 
     <!-- Icon + Text -->
     <dimen name="icon_area_height">70dp</dimen>
-    <dimen name="icon_area_margin_top">20dp</dimen>
-    <dimen name="icon_area_margin_bottom">20dp</dimen>
+    <dimen name="icon_area_margin_top">30dp</dimen>
+    <dimen name="icon_area_margin_bottom">30dp</dimen>
     <dimen name="icon_hint_text_size">15sp</dimen>
     <dimen name="icon_image_padding_bottom">17dp</dimen>
     <dimen name="icon_hint_margin_bottom">5dp</dimen>
@@ -27,5 +28,10 @@
     <dimen name="adas_separtor_line_margin_top_bottom">10dp</dimen>
     <dimen name="adas_sensity_item_width">90px</dimen>
     <dimen name="adas_speed_item_width">90px</dimen>
+
+    <!-- Record Fullscreen -->
+    <dimen name="record_button_one_margin">120px</dimen>
+    <dimen name="record_button_two_margin">50px</dimen>
+    <dimen name="record_button_three_margin">25px</dimen>
 
 </resources>
