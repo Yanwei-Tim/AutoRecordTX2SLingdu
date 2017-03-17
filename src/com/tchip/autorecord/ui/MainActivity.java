@@ -303,7 +303,7 @@ public class MainActivity extends Activity {
 							Constant.Broadcast.HIDE_FORMAT_DIALOG));
 				}
 			} else {
-				switchCameraTo(Integer.parseInt(strBackState));
+				switchCameraTo(1); // Integer.parseInt(strBackState)
 			}
 		}
 		super.onResume();
