@@ -53,11 +53,11 @@ public class BackLineView extends View {
 	private static final int DEFALT_1X_X2S_FULL = 470;
 	private static final int DEFALT_1Y_X2S_FULL = 455;
 	private static final int DEFALT_2X_X2S_FULL = 526;
-	private static final int DEFALT_2Y_X2S_FULL = 365;
+	private static final int DEFALT_2Y_X2S_FULL = 380; // 365
 	private static final int DEFALT_3X_X2S_FULL = 612;
 	private static final int DEFALT_3Y_X2S_FULL = 285;
 	private static final int DEFALT_4X_X2S_FULL = 665;
-	private static final int DEFALT_4Y_X2S_FULL = 180; // 212
+	private static final int DEFALT_4Y_X2S_FULL = 160; // 212
 	private static final int DEFALT_5X_X2S_FULL = 1220;
 	private static final int DEFALT_5Y_X2S_FULL = DEFALT_4Y_X2S_FULL;
 	private static final int DEFALT_6X_X2S_FULL = 1324;
@@ -146,7 +146,7 @@ public class BackLineView extends View {
 	private int TEXT_STROKE_WIDTH = 1;
 	/** 编辑指示图半径 */
 	private int POINT_HINT_RADIUS = 25;
-	private int TEXT_SIZE = 35;
+	private int TEXT_SIZE = 40;
 	/** 文字垂直偏移 */
 	private int TEXT_RADIUS = 15;
 	/** 是否是编辑模式 */
@@ -309,7 +309,7 @@ public class BackLineView extends View {
 		canvas.drawText(context.getString(R.string.back_line_red),
 				point7[0] + 30, point7[1] + TEXT_RADIUS, paint);
 		canvas.drawText(context.getString(R.string.back_line_red),
-				point2[0] - 100, point2[1] + TEXT_RADIUS, paint);
+				point2[0] - 110, point2[1] + TEXT_RADIUS, paint);
 		paint.setStrokeWidth(LINE_STROKE_WIDTH);
 
 		PathEffect effect = new DashPathEffect(new float[] { 14, 14, 14, 14 },

@@ -688,7 +688,7 @@ public class MainActivity extends Activity {
 	}
 
 	private MainReceiver mainReceiver;
-	private int cameraBeforeBack = 0; // 倒车前界面：0-前 1-后 2-前后
+	private int cameraBeforeBack = 1; // 倒车前界面：0-前 1-后 2-前后
 
 	public class MainReceiver extends BroadcastReceiver {
 
@@ -735,11 +735,15 @@ public class MainActivity extends Activity {
 				}
 			} else if (action.equals(Constant.Broadcast.BACK_CAR_OFF)) {
 				releaseFullWakeLock();
-				setBackPreviewBig(false);
+				// setBackPreviewBig(false);
 				setBackLineVisible(false);
-				if ("com.tchip.autorecord".equals(ProviderUtil.getValue(
-						context, Name.PKG_WHEN_BACK, "com.xxx.xxx"))) {
-					switchCameraWhenBackOver(cameraBeforeBack);
+				switchCameraWhenBackOver(cameraBeforeBack);
+
+				String pkgWhenBack = ProviderUtil.getValue(context,
+						Name.PKG_WHEN_BACK, "com.xxx.xxx");
+				if ("com.tchip.autorecord".equals(pkgWhenBack)) {
+				} else {
+					moveTaskToBack(true);
 				}
 			} else if (action.equals(Constant.Broadcast.SPEECH_COMMAND)) {
 				String command = intent.getExtras().getString("command");
