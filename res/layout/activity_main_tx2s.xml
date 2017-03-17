@@ -186,7 +186,7 @@
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@null"
                 android:paddingBottom="@dimen/icon_image_padding_bottom"
-                android:src="@drawable/camera_switch" />
+                android:src="@drawable/icon_exit" />
 
             <TextView
                 android:id="@+id/textExit"

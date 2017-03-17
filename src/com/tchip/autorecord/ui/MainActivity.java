@@ -88,6 +88,8 @@ public class MainActivity extends Activity {
 	private TextView textVideoLock;
 	private ImageButton imageCameraSwitch; // 前后切换
 	private TextView textCameraSwitch;
+	private ImageButton imageExit; // 退出
+	private TextView textExit;
 	private ImageButton imageVideoSize; // 视频尺寸
 	private TextView textVideoSize;
 	private ImageButton imageVideoLength; // 视频分段
@@ -149,8 +151,8 @@ public class MainActivity extends Activity {
 		mMainHandler = new Handler(this.getMainLooper());
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		CAMERA_WIDTH = 1920;//1280;
-		CAMERA_HEIGHT = 480;//455;
+		CAMERA_WIDTH = 1920;// 1280;
+		CAMERA_HEIGHT = 480;// 455;
 
 		setStatusBarVisible(true);
 		setContentView(R.layout.activity_main_tx2s);
@@ -537,7 +539,7 @@ public class MainActivity extends Activity {
 			}
 		} else {
 			setBackLineVisible(false);
-//			setStatusBarVisible(true);
+			// setStatusBarVisible(true);
 			layoutBack.setVisibility(View.VISIBLE);
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
 					CAMERA_WIDTH, CAMERA_HEIGHT)); // 1280 * 445
@@ -1195,6 +1197,12 @@ public class MainActivity extends Activity {
 		textCameraSwitch = (TextView) findViewById(R.id.textCameraSwitch);
 		textCameraSwitch.setOnClickListener(myOnClickListener);
 
+		// 退出
+		imageExit = (ImageButton) findViewById(R.id.imageExit);
+		imageExit.setOnClickListener(myOnClickListener);
+		textExit = (TextView) findViewById(R.id.textExit);
+		textExit.setOnClickListener(myOnClickListener);
+
 		// 拍照
 		imagePhotoTake = (ImageButton) findViewById(R.id.imagePhotoTake);
 		imagePhotoTake.setOnClickListener(myOnClickListener);
@@ -1695,6 +1703,11 @@ public class MainActivity extends Activity {
 			case R.id.imageBackLineReset:
 				backLineView.clearPonitConfig();
 				backLineView.invalidate();
+				break;
+
+			case R.id.imageExit:
+			case R.id.textExit:
+				moveTaskToBack(true);
 				break;
 
 			default:
