@@ -132,6 +132,11 @@ public interface Constant {
 		 *            前车碰撞预警
 		 */
 		public static final String ADAS_MSG = "tchip.intent.action.ADAS_MSG";
+
+		/** 快速设置指示 */
+		public static final String QUICK_SET_HINT_SHOW = "com.tchip.quicksettings.uvc.show";
+
+		public static final String QUICK_SET_HINT_HIDE = "com.tchip.quicksettings.uvc.unshow";
 	}
 
 	public static final class GravitySensor {
