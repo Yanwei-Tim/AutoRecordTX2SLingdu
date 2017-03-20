@@ -502,7 +502,7 @@ public class MainActivity extends Activity {
 			int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 			uiFlags |= 0x00001000;
 			getWindow().getDecorView().setSystemUiVisibility(uiFlags);
-			
+
 			sendBroadcast(new Intent(Constant.Broadcast.QUICK_SET_HINT_SHOW));
 		} else {
 			int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -512,7 +512,7 @@ public class MainActivity extends Activity {
 					| View.SYSTEM_UI_FLAG_FULLSCREEN;
 			uiFlags |= 0x00001000;
 			getWindow().getDecorView().setSystemUiVisibility(uiFlags);
-			
+
 			sendBroadcast(new Intent(Constant.Broadcast.QUICK_SET_HINT_HIDE));
 		}
 	}
