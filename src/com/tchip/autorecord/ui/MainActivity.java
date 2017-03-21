@@ -1571,13 +1571,13 @@ public class MainActivity extends Activity {
 										Name.REC_BACK_STATE, "0");
 							}
 							startRecordBack();
+
+							MyApp.isFrontLock = true;
+							MyApp.isBackLock = true;
+							setupRecordViews();
 						} else {
 							noVideoSDHint();
 						}
-
-						MyApp.isFrontLock = true;
-						MyApp.isBackLock = true;
-						setupRecordViews();
 					}
 				}
 				break;
