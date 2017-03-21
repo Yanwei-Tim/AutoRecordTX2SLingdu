@@ -524,32 +524,15 @@ public class MainActivity extends Activity {
 	 */
 	private void setBackPreviewBig(boolean big) {
 		MyLog.i("setBackPreviewBig:" + big);
-		if (big) {
-			setStatusBarVisible(false);
-			layoutBack.setVisibility(View.VISIBLE);
-			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
-					1920, 480)); // 1920 * 480
-			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
-					1));
-			layoutFront.setVisibility(View.GONE);
-
-			String strBackState = ProviderUtil.getValue(context,
-					Name.BACK_CAR_STATE, "0");
-			if ("1".equals(strBackState)) {
-				setBackLineVisible(true);
-			} else {
-				setBackLineVisible(false);
-			}
-		} else {
-			setBackLineVisible(false);
-			// setStatusBarVisible(true);
-			layoutBack.setVisibility(View.VISIBLE);
-			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
+		surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
 					CAMERA_WIDTH, CAMERA_HEIGHT)); // 1280 * 445
-			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
-					1));
-			layoutFront.setVisibility(View.GONE);
-		}
+
+		setBackLineVisible("1".equals(ProviderUtil.getValue(context,
+				Name.BACK_CAR_STATE, "0")));
+		layoutBack.setVisibility(View.VISIBLE);
+		surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1, 1));
+		layoutFront.setVisibility(View.GONE);
+		
 	}
 
 	class BackHomeWhenBootThread implements Runnable {
@@ -738,7 +721,6 @@ public class MainActivity extends Activity {
 				}
 			} else if (action.equals(Constant.Broadcast.BACK_CAR_OFF)) {
 				releaseFullWakeLock();
-				// setBackPreviewBig(false);
 				setBackLineVisible(false);
 				switchCameraWhenBackOver(cameraBeforeBack);
 
