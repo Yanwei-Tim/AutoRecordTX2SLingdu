@@ -56,6 +56,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -65,6 +66,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextClock;
 import android.widget.TextView;
 
@@ -125,7 +127,9 @@ public class MainActivity extends Activity {
 
 	/** UI配置 */
 	private int CAMERA_WIDTH = 1920;
-	private int CAMERA_HEIGHT = 480; // 480;
+	private int CAMERA_HEIGHT_FRONT = 480; // 480;
+	private int CAMERA_HEIGHT_BACK = 720;
+	private ScrollView scrollPreview;
 
 	// ADAS
 	private ADASInterface adasInterface;
@@ -150,9 +154,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mMainHandler = new Handler(this.getMainLooper());
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-		CAMERA_WIDTH = 1920;// 1280;
-		CAMERA_HEIGHT = 480;// 455;
 
 		setStatusBarVisible(true);
 		setContentView(R.layout.activity_main_tx2s);
@@ -298,13 +299,15 @@ public class MainActivity extends Activity {
 							getString(R.string.no_cvbs_detect));
 				} else {
 					switchCameraTo(Integer.parseInt(strBackState));
-					setBackPreviewBig(true);
+					setBackPreviewBig();
 					sendBroadcast(new Intent(
 							Constant.Broadcast.HIDE_FORMAT_DIALOG));
 				}
 			} else {
 				switchCameraTo(1); // Integer.parseInt(strBackState)
 			}
+		} else {
+			switchCameraTo(cameraBeforeBack);
 		}
 		super.onResume();
 	}
@@ -522,17 +525,17 @@ public class MainActivity extends Activity {
 	 * 
 	 * @param big
 	 */
-	private void setBackPreviewBig(boolean big) {
-		MyLog.i("setBackPreviewBig:" + big);
+	private void setBackPreviewBig() {
+		MyLog.i("setBackPreviewBig:");
 		surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH, CAMERA_HEIGHT)); // 1280 * 445
+				CAMERA_WIDTH, CAMERA_HEIGHT_BACK));
 
 		setBackLineVisible("1".equals(ProviderUtil.getValue(context,
 				Name.BACK_CAR_STATE, "0")));
 		layoutBack.setVisibility(View.VISIBLE);
 		surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1, 1));
 		layoutFront.setVisibility(View.GONE);
-		
+
 	}
 
 	class BackHomeWhenBootThread implements Runnable {
@@ -717,7 +720,7 @@ public class MainActivity extends Activity {
 				} else {
 					acquireFullWakeLock();
 					setBackLineVisible(true);
-					setBackPreviewBig(true);
+					setBackPreviewBig();
 				}
 			} else if (action.equals(Constant.Broadcast.BACK_CAR_OFF)) {
 				releaseFullWakeLock();
@@ -1150,6 +1153,14 @@ public class MainActivity extends Activity {
 		layoutBack.setVisibility(View.GONE);
 		layoutFront = (RelativeLayout) findViewById(R.id.layoutFront);
 		layoutFront.setVisibility(View.VISIBLE);
+		scrollPreview = (ScrollView) findViewById(R.id.scrollPreview);
+		scrollPreview.setOnTouchListener(new View.OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true; // 禁止滑动
+			}
+		});
 		initialRecordSurface();
 
 		textLatLng = (TextView) findViewById(R.id.textLatLng);
@@ -1251,7 +1262,7 @@ public class MainActivity extends Activity {
 			layoutFront.setVisibility(View.VISIBLE);
 			imageAdas.setVisibility(View.VISIBLE);
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH, CAMERA_HEIGHT));
+					CAMERA_WIDTH, CAMERA_HEIGHT_FRONT));
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 			layoutBack.setVisibility(View.GONE);
@@ -1272,7 +1283,7 @@ public class MainActivity extends Activity {
 		case 1: // BACK
 			layoutBack.setVisibility(View.VISIBLE);
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH, CAMERA_HEIGHT)); // 854,480
+					CAMERA_WIDTH, CAMERA_HEIGHT_BACK));
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 
@@ -1305,9 +1316,9 @@ public class MainActivity extends Activity {
 			layoutFront.setVisibility(View.VISIBLE);
 			imageAdas.setVisibility(View.GONE);
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH / 2, CAMERA_HEIGHT));
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT_FRONT));
 			RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH / 2, CAMERA_HEIGHT);
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT_FRONT);
 			backLayoutParams.leftMargin = CAMERA_WIDTH / 2;
 			surfaceViewBack.setLayoutParams(backLayoutParams);
 			layoutBack.setVisibility(View.GONE);
@@ -1341,7 +1352,7 @@ public class MainActivity extends Activity {
 		case 0:
 			layoutFront.setVisibility(View.VISIBLE);
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH, CAMERA_HEIGHT));
+					CAMERA_WIDTH, CAMERA_HEIGHT_FRONT));
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 			layoutBack.setVisibility(View.GONE);
@@ -1363,7 +1374,7 @@ public class MainActivity extends Activity {
 		case 1:
 			layoutFront.setVisibility(View.VISIBLE);
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH, CAMERA_HEIGHT)); // 854,480
+					CAMERA_WIDTH, CAMERA_HEIGHT_BACK));
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 
@@ -1384,9 +1395,9 @@ public class MainActivity extends Activity {
 			layoutFront.setVisibility(View.VISIBLE);
 			imageAdas.setVisibility(View.GONE);
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH / 2, CAMERA_HEIGHT));
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT_FRONT));
 			RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(
-					CAMERA_WIDTH / 2, CAMERA_HEIGHT);
+					CAMERA_WIDTH / 2, CAMERA_HEIGHT_FRONT);
 			backLayoutParams.leftMargin = CAMERA_WIDTH / 2;
 			surfaceViewBack.setLayoutParams(backLayoutParams);
 			layoutBack.setVisibility(View.GONE);
@@ -1419,9 +1430,11 @@ public class MainActivity extends Activity {
 		MyLog.v("setBackLineVisible:" + isVisible);
 		if (isVisible) {
 			// 确保显示后摄,解决倒车线在前摄界面
+			scrollPreview.scrollTo(0, 240);
+
 			layoutBack.setVisibility(View.VISIBLE);
 			surfaceViewBack.setLayoutParams(new RelativeLayout.LayoutParams(
-					1920, 480));
+					CAMERA_WIDTH, CAMERA_HEIGHT_BACK));
 			surfaceViewFront.setLayoutParams(new RelativeLayout.LayoutParams(1,
 					1));
 			layoutFront.setVisibility(View.GONE);
@@ -1437,6 +1450,8 @@ public class MainActivity extends Activity {
 				layoutBackLine.addView(backLineView);
 			}
 		} else {
+			scrollPreview.scrollTo(0, 0);
+
 			layoutBackLineControl.setVisibility(View.GONE);
 			layoutBackLine.removeAllViews();
 		}

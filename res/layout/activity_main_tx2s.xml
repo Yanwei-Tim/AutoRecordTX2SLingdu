@@ -5,15 +5,27 @@
     android:background="#000000"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <SurfaceView
-        android:id="@+id/surfaceViewFront"
+    <ScrollView
+        android:id="@+id/scrollPreview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scrollbars="none" >
 
-    <SurfaceView
-        android:id="@+id/surfaceViewBack"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <SurfaceView
+                android:id="@+id/surfaceViewFront"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <SurfaceView
+                android:id="@+id/surfaceViewBack"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/layoutBackLine"
