@@ -127,7 +127,7 @@ public class MainActivity extends Activity {
 
 	/** UI配置 */
 	private int CAMERA_WIDTH = 1920;
-	private int CAMERA_HEIGHT_FRONT = 480; // 480;
+	private int CAMERA_HEIGHT_FRONT = 480;
 	private int CAMERA_HEIGHT_BACK = 720;
 	private ScrollView scrollPreview;
 
